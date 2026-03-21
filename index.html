@@ -533,6 +533,11 @@
     --c6: #e67e22; --c7: #1abc9c; --c8: #e91e63; --c9: #00bcd4;
   }
 
+  /* Hide number input spinners */
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; margin:0; }
+  input[type=number] { -moz-appearance:textfield; }
+
   /* SCROLLBAR */
   ::-webkit-scrollbar { width:6px; height:6px; }
   ::-webkit-scrollbar-track { background:transparent; }
@@ -825,63 +830,118 @@
 
 <!-- Sell Modal -->
 <div class="modal-overlay" id="modal-sell">
-  <div class="modal" style="max-width:420px;">
+  <div class="modal" style="max-width:400px;">
     <div class="modal-header">
       <div class="modal-title">💸 تسجيل عملية بيع</div>
       <button class="modal-close" onclick="closeModal('sell')">✕</button>
     </div>
-    <div class="modal-body">
-      <!-- Product info card -->
-      <div style="background:var(--bg-card2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:18px;display:flex;align-items:center;gap:14px;">
-        <div id="sellModalImg" style="width:52px;height:52px;border-radius:8px;background:var(--bg-primary);display:flex;align-items:center;justify-content:center;font-size:26px;overflow:hidden;flex-shrink:0;"></div>
-        <div>
-          <div id="sellModalSubName" style="font-size:15px;font-weight:700;"></div>
-          <div id="sellModalCatName" style="font-size:12px;color:var(--accent-gold);margin-top:2px;"></div>
-          <div style="margin-top:6px;display:flex;gap:16px;">
-            <span style="font-size:12px;color:var(--text-secondary);">المتاح: <strong id="sellModalStock" style="color:var(--accent-teal);font-size:14px;"></strong></span>
-            <span style="font-size:12px;color:var(--text-secondary);">مُباع سابقاً: <strong id="sellModalSoldBefore" style="color:var(--accent-red);font-size:14px;"></strong></span>
+    <div class="modal-body" style="padding:20px;">
+
+      <!-- بطاقة المنتج -->
+      <div style="
+        background:var(--bg-card2);
+        border:1px solid var(--border-glow);
+        border-radius:12px;
+        padding:14px 16px;
+        margin-bottom:20px;
+        display:flex;
+        align-items:center;
+        gap:14px;
+      ">
+        <div id="sellModalImg" style="
+          width:56px; height:56px;
+          border-radius:10px;
+          background:var(--bg-primary);
+          border:1px solid var(--border);
+          display:flex; align-items:center; justify-content:center;
+          font-size:28px; overflow:hidden; flex-shrink:0;
+        "></div>
+        <div style="flex:1;">
+          <div id="sellModalSubName" style="font-size:16px;font-weight:800;color:var(--text-primary);"></div>
+          <div id="sellModalCatName" style="font-size:12px;color:var(--accent-gold);margin-top:3px;"></div>
+          <div style="margin-top:8px;display:flex;gap:20px;">
+            <div style="text-align:center;">
+              <div id="sellModalStock" style="font-size:20px;font-weight:800;color:var(--accent-teal);"></div>
+              <div style="font-size:10px;color:var(--text-dim);">متاح</div>
+            </div>
+            <div style="text-align:center;">
+              <div id="sellModalSoldBefore" style="font-size:20px;font-weight:800;color:var(--accent-red);"></div>
+              <div style="font-size:10px;color:var(--text-dim);">مُباع سابقاً</div>
+            </div>
           </div>
-        </div>
-      </div>
-      <!-- Client info -->
-      <div style="border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:16px;">
-        <div style="font-size:11px;font-weight:700;color:var(--accent-gold);letter-spacing:1px;margin-bottom:12px;display:flex;align-items:center;gap:6px;">
-          👤 بيانات العميل
-        </div>
-        <div class="form-row" style="margin-bottom:12px;">
-          <div class="form-group" style="margin-bottom:0;">
-            <label class="form-label">الاسم *</label>
-            <input class="form-input" id="clientFirstName" placeholder="الاسم الأول" autocomplete="off">
-          </div>
-          <div class="form-group" style="margin-bottom:0;">
-            <label class="form-label">اللقب *</label>
-            <input class="form-input" id="clientLastName" placeholder="اللقب / الكنية" autocomplete="off">
-          </div>
-        </div>
-        <div class="form-group" style="margin-bottom:0;">
-          <label class="form-label">رقم الهاتف *</label>
-          <input class="form-input" id="clientPhone" placeholder="مثال: 0555 123 456" type="tel" autocomplete="off"
-            style="letter-spacing:1px;">
         </div>
       </div>
 
-      <div class="form-group">
-        <label class="form-label">الكمية المباعة *</label>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <button class="btn btn-ghost" style="width:40px;height:40px;padding:0;font-size:20px;flex-shrink:0;" onclick="changeSellQty(-1)">−</button>
-          <input class="form-input" type="number" id="sellQty" value="1" min="1"
-            style="text-align:center;font-size:22px;font-weight:800;color:var(--accent-red);height:48px;"
-            oninput="validateSellQty()">
-          <button class="btn btn-ghost" style="width:40px;height:40px;padding:0;font-size:20px;flex-shrink:0;" onclick="changeSellQty(1)">＋</button>
+      <!-- اختيار الكمية -->
+      <div style="margin-bottom:8px;">
+        <div style="font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:12px;text-align:center;">
+          الكمية المباعة
         </div>
-        <div style="font-size:11px;color:var(--text-dim);margin-top:6px;text-align:center;" id="sellQtyHint"></div>
+        <div style="
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          gap:0;
+          background:var(--bg-primary);
+          border:1px solid var(--border-glow);
+          border-radius:12px;
+          overflow:hidden;
+          height:58px;
+        ">
+          <!-- زر الزيادة على اليمين (RTL) -->
+          <button onclick="changeSellQty(1)" style="
+            width:58px; height:58px; border:none; cursor:pointer;
+            background:rgba(212,168,67,0.08);
+            color:var(--accent-gold); font-size:24px; font-weight:700;
+            border-left:1px solid var(--border);
+            transition:background 0.15s;
+            flex-shrink:0;
+          " onmouseover="this.style.background='rgba(212,168,67,0.18)'"
+             onmouseout="this.style.background='rgba(212,168,67,0.08)'">＋</button>
+
+          <!-- الرقم في المنتصف -->
+          <input type="number" id="sellQty" value="1" min="1"
+            oninput="validateSellQty()"
+            style="
+              flex:1; height:58px; border:none; outline:none;
+              background:transparent;
+              text-align:center;
+              font-family:'Cairo',sans-serif;
+              font-size:28px; font-weight:900;
+              color:var(--accent-red);
+              -moz-appearance:textfield;
+            ">
+
+          <!-- زر الطرح على اليسار (RTL) -->
+          <button onclick="changeSellQty(-1)" style="
+            width:58px; height:58px; border:none; cursor:pointer;
+            background:rgba(224,90,90,0.08);
+            color:var(--accent-red); font-size:28px; font-weight:700;
+            border-right:1px solid var(--border);
+            transition:background 0.15s;
+            flex-shrink:0;
+          " onmouseover="this.style.background='rgba(224,90,90,0.18)'"
+             onmouseout="this.style.background='rgba(224,90,90,0.08)'">−</button>
+        </div>
+        <div id="sellQtyHint" style="font-size:11px;color:var(--text-dim);margin-top:8px;text-align:center;"></div>
       </div>
+
       <input type="hidden" id="sellCatId">
       <input type="hidden" id="sellSubId">
     </div>
+
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('sell')">إلغاء</button>
-      <button class="btn btn-red" style="background:linear-gradient(135deg,#e05a5a,#b03030);color:#fff;box-shadow:0 4px 14px rgba(224,90,90,0.3);" onclick="doSell()">
+      <button onclick="doSell()" style="
+        display:inline-flex; align-items:center; gap:8px;
+        padding:10px 24px; border-radius:8px; border:none; cursor:pointer;
+        font-family:'Cairo',sans-serif; font-size:14px; font-weight:700;
+        background:linear-gradient(135deg,#e05a5a,#b03030);
+        color:#fff;
+        box-shadow:0 4px 16px rgba(224,90,90,0.4);
+        transition:all 0.2s;
+      " onmouseover="this.style.transform='translateY(-1px)'"
+         onmouseout="this.style.transform='translateY(0)'">
         💸 تأكيد البيع
       </button>
     </div>
