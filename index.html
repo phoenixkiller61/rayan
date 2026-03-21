@@ -823,6 +823,71 @@
   </div>
 </div>
 
+<!-- Sell Modal -->
+<div class="modal-overlay" id="modal-sell">
+  <div class="modal" style="max-width:420px;">
+    <div class="modal-header">
+      <div class="modal-title">💸 تسجيل عملية بيع</div>
+      <button class="modal-close" onclick="closeModal('sell')">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- Product info card -->
+      <div style="background:var(--bg-card2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:18px;display:flex;align-items:center;gap:14px;">
+        <div id="sellModalImg" style="width:52px;height:52px;border-radius:8px;background:var(--bg-primary);display:flex;align-items:center;justify-content:center;font-size:26px;overflow:hidden;flex-shrink:0;"></div>
+        <div>
+          <div id="sellModalSubName" style="font-size:15px;font-weight:700;"></div>
+          <div id="sellModalCatName" style="font-size:12px;color:var(--accent-gold);margin-top:2px;"></div>
+          <div style="margin-top:6px;display:flex;gap:16px;">
+            <span style="font-size:12px;color:var(--text-secondary);">المتاح: <strong id="sellModalStock" style="color:var(--accent-teal);font-size:14px;"></strong></span>
+            <span style="font-size:12px;color:var(--text-secondary);">مُباع سابقاً: <strong id="sellModalSoldBefore" style="color:var(--accent-red);font-size:14px;"></strong></span>
+          </div>
+        </div>
+      </div>
+      <!-- Client info -->
+      <div style="border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:16px;">
+        <div style="font-size:11px;font-weight:700;color:var(--accent-gold);letter-spacing:1px;margin-bottom:12px;display:flex;align-items:center;gap:6px;">
+          👤 بيانات العميل
+        </div>
+        <div class="form-row" style="margin-bottom:12px;">
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">الاسم *</label>
+            <input class="form-input" id="clientFirstName" placeholder="الاسم الأول" autocomplete="off">
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">اللقب *</label>
+            <input class="form-input" id="clientLastName" placeholder="اللقب / الكنية" autocomplete="off">
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label">رقم الهاتف *</label>
+          <input class="form-input" id="clientPhone" placeholder="مثال: 0555 123 456" type="tel" autocomplete="off"
+            style="letter-spacing:1px;">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">الكمية المباعة *</label>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <button class="btn btn-ghost" style="width:40px;height:40px;padding:0;font-size:20px;flex-shrink:0;" onclick="changeSellQty(-1)">−</button>
+          <input class="form-input" type="number" id="sellQty" value="1" min="1"
+            style="text-align:center;font-size:22px;font-weight:800;color:var(--accent-red);height:48px;"
+            oninput="validateSellQty()">
+          <button class="btn btn-ghost" style="width:40px;height:40px;padding:0;font-size:20px;flex-shrink:0;" onclick="changeSellQty(1)">＋</button>
+        </div>
+        <div style="font-size:11px;color:var(--text-dim);margin-top:6px;text-align:center;" id="sellQtyHint"></div>
+      </div>
+      <input type="hidden" id="sellCatId">
+      <input type="hidden" id="sellSubId">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('sell')">إلغاء</button>
+      <button class="btn btn-red" style="background:linear-gradient(135deg,#e05a5a,#b03030);color:#fff;box-shadow:0 4px 14px rgba(224,90,90,0.3);" onclick="doSell()">
+        💸 تأكيد البيع
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- Confirm Delete -->
 <div class="modal-overlay" id="modal-confirmDelete">
   <div class="modal" style="max-width:380px;">
@@ -1133,23 +1198,105 @@ function sellItem(catId, subId) {
   const sub = cat?.subcategories.find(s => s.id === subId);
   if (!sub) return;
   if (sub.quantity <= 0) { toast('⚠️ لا يوجد مخزون كافٍ!','error'); return; }
-  sub.quantity--;
-  sub.sold = (sub.sold||0) + 1;
+
+  document.getElementById('sellCatId').value = catId;
+  document.getElementById('sellSubId').value = subId;
+  document.getElementById('sellModalSubName').textContent = sub.name;
+  document.getElementById('sellModalCatName').textContent = cat.name;
+  document.getElementById('sellModalStock').textContent = sub.quantity;
+  document.getElementById('sellModalSoldBefore').textContent = sub.sold || 0;
+  document.getElementById('sellQty').value = 1;
+  document.getElementById('sellQtyHint').textContent = `الحد الأقصى: ${sub.quantity} قطعة`;
+
+  // Show image or icon
+  const imgEl = document.getElementById('sellModalImg');
+  if (sub.image) {
+    imgEl.innerHTML = `<img src="${sub.image}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">`;
+  } else {
+    imgEl.textContent = cat.icon || '📦';
+  }
+
+  // Reset client fields
+  document.getElementById('clientFirstName').value = '';
+  document.getElementById('clientLastName').value = '';
+  document.getElementById('clientPhone').value = '';
+
+  openModal('sell');
+}
+
+function changeSellQty(delta) {
+  const input = document.getElementById('sellQty');
+  const catId = document.getElementById('sellCatId').value;
+  const subId = document.getElementById('sellSubId').value;
+  const cat = state.categories.find(c => c.id === catId);
+  const sub = cat?.subcategories.find(s => s.id === subId);
+  const max = sub ? sub.quantity : 999;
+  let val = (parseInt(input.value) || 1) + delta;
+  val = Math.max(1, Math.min(val, max));
+  input.value = val;
+}
+
+function validateSellQty() {
+  const input = document.getElementById('sellQty');
+  const catId = document.getElementById('sellCatId').value;
+  const subId = document.getElementById('sellSubId').value;
+  const cat = state.categories.find(c => c.id === catId);
+  const sub = cat?.subcategories.find(s => s.id === subId);
+  const max = sub ? sub.quantity : 999;
+  let val = parseInt(input.value) || 1;
+  if (val < 1) val = 1;
+  if (val > max) { val = max; toast(`الحد الأقصى ${max} قطعة`, 'warning'); }
+  input.value = val;
+}
+
+function doSell() {
+  const catId = document.getElementById('sellCatId').value;
+  const subId = document.getElementById('sellSubId').value;
+  const qty = parseInt(document.getElementById('sellQty').value) || 1;
+  const firstName = document.getElementById('clientFirstName').value.trim();
+  const lastName = document.getElementById('clientLastName').value.trim();
+  const phone = document.getElementById('clientPhone').value.trim();
+
+  if (!firstName) { toast('⚠️ أدخل اسم العميل','error'); document.getElementById('clientFirstName').focus(); return; }
+  if (!lastName)  { toast('⚠️ أدخل لقب العميل','error');  document.getElementById('clientLastName').focus();  return; }
+  if (!phone)     { toast('⚠️ أدخل رقم الهاتف','error');  document.getElementById('clientPhone').focus();      return; }
+
+  const cat = state.categories.find(c => c.id === catId);
+  const sub = cat?.subcategories.find(s => s.id === subId);
+  if (!sub) return;
+  if (qty > sub.quantity) { toast('⚠️ الكمية تتجاوز المخزون!','error'); return; }
+
+  const qtyBefore = sub.quantity;
+  sub.quantity -= qty;
+  sub.sold = (sub.sold||0) + qty;
+
+  // Generate unique transaction code: RYN-YYYYMMDD-XXXX
+  const now = new Date();
+  const datePart = now.getFullYear().toString() +
+    String(now.getMonth()+1).padStart(2,'0') +
+    String(now.getDate()).padStart(2,'0');
+  const randPart = Math.random().toString(36).slice(2,6).toUpperCase();
+  const txCode = `RYN-${datePart}-${randPart}`;
 
   const logEntry = {
     id: uid(),
+    txCode,
     catId, subId,
     catName: cat.name,
     subName: sub.name,
-    time: new Date().toISOString(),
-    quantityBefore: sub.quantity + 1,
+    qty,
+    clientName: `${firstName} ${lastName}`,
+    clientPhone: phone,
+    time: now.toISOString(),
+    quantityBefore: qtyBefore,
     quantityAfter: sub.quantity
   };
   state.sellLog.unshift(logEntry);
   save();
   renderSubcategories(catId);
   updateStats();
-  toast(`✅ تم بيع: ${sub.name}`, 'success');
+  closeModal('sell');
+  toast(`✅ تم بيع ${qty} قطعة — ${firstName} ${lastName}`, 'success');
 }
 
 function undoSell(logId) {
@@ -1158,8 +1305,9 @@ function undoSell(logId) {
   const cat = state.categories.find(c => c.id === entry.catId);
   const sub = cat?.subcategories.find(s => s.id === entry.subId);
   if (!sub) { toast('⚠️ التصنيف لم يعد موجوداً','error'); return; }
-  sub.quantity++;
-  sub.sold = Math.max(0, (sub.sold||0) - 1);
+  const qty = entry.qty || 1;
+  sub.quantity += qty;
+  sub.sold = Math.max(0, (sub.sold||0) - qty);
   state.sellLog = state.sellLog.filter(l => l.id !== logId);
   save();
   if (state.currentCatId === entry.catId) renderSubcategories(entry.catId);
@@ -1297,16 +1445,38 @@ function renderSellLog() {
   document.getElementById('sellLog').innerHTML = log.map(entry => {
     const d = new Date(entry.time);
     const timeStr = d.toLocaleDateString('ar-SA') + ' — ' + d.toLocaleTimeString('ar-SA', {hour:'2-digit',minute:'2-digit'});
+    const qty = entry.qty || 1;
+    const clientName = entry.clientName || '—';
+    const clientPhone = entry.clientPhone || '—';
+    const txCode = entry.txCode || '—';
     return `
-    <div class="sell-log-item">
-      <div class="sell-log-info">
-        <div class="sell-log-name">${entry.subName}</div>
-        <div class="sell-log-cat">${entry.catName}</div>
-        <div class="sell-log-time">${timeStr}</div>
-      </div>
-      <div class="sell-log-actions">
-        <div class="sell-badge">-1 قطعة</div>
+    <div class="sell-log-item" style="flex-direction:column;align-items:stretch;gap:10px;">
+      <!-- Row 1: tx code + undo -->
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-family:monospace;font-size:11px;font-weight:700;background:rgba(212,168,67,0.1);border:1px solid rgba(212,168,67,0.3);color:var(--accent-gold);padding:3px 10px;border-radius:6px;letter-spacing:1px;">
+            # ${txCode}
+          </span>
+          <span style="font-size:11px;color:var(--text-dim);">${timeStr}</span>
+        </div>
         <button class="btn btn-ghost btn-xs" onclick="undoSell('${entry.id}')" title="تراجع عن البيع">↩️ تراجع</button>
+      </div>
+      <!-- Row 2: product + qty badge -->
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+        <div>
+          <div class="sell-log-name">${entry.subName}</div>
+          <div class="sell-log-cat">${entry.catName} &nbsp;|&nbsp; قبل: ${entry.quantityBefore} → بعد: ${entry.quantityAfter}</div>
+        </div>
+        <div class="sell-badge" style="font-size:13px;padding:4px 14px;">−${qty} قطعة</div>
+      </div>
+      <!-- Row 3: client info -->
+      <div style="background:rgba(58,123,213,0.07);border:1px solid rgba(58,123,213,0.15);border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+        <span style="font-size:12px;color:var(--text-secondary);display:flex;align-items:center;gap:5px;">
+          👤 <strong style="color:var(--text-primary);">${clientName}</strong>
+        </span>
+        <span style="font-size:12px;color:var(--text-secondary);display:flex;align-items:center;gap:5px;">
+          📞 <strong style="color:var(--accent-teal);font-family:monospace;letter-spacing:0.5px;">${clientPhone}</strong>
+        </span>
       </div>
     </div>`;
   }).join('');
