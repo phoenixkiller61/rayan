@@ -329,6 +329,234 @@ input[type=number]{-moz-appearance:textfield;}
   <div class="mdl" style="max-width:380px;">
     <div class="mhdr"><div class="mt">📥 إضافة مخزون</div><button class="mx" onclick="closeM('mAddStock')">✕</button></div>
     <div class="mbody">
+      <div /* FORM */
+.fg{margin-bottom:14px;}
+.fl{font-size:11px;font-weight:600;color:var(--t2);margin-bottom:5px;display:block;}
+.fi,.fsel{width:100%;background:var(--bg);border:1px solid var(--br);border-radius:8px;padding:9px 12px;color:var(--t1);font-family:'Cairo',sans-serif;font-size:13px;outline:none;transition:border-color .2s;}
+.fi:focus,.fsel:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,168,67,0.09);}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
+input[type=number]{-moz-appearance:textfield;}
+
+/* IMG DROP */
+.img-drop{border:2px dashed var(--br2);border-radius:10px;padding:18px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(255,255,255,0.015);position:relative;overflow:hidden;}
+.img-drop:hover{border-color:var(--gold);background:var(--gg);}
+.img-drop input{position:absolute;inset:0;opacity:0;cursor:pointer;}
+.img-drop-ico{font-size:26px;margin-bottom:5px;display:block;}
+.img-drop-txt{font-size:11px;color:var(--t2);}
+.img-prev{width:54px;height:54px;border-radius:7px;object-fit:cover;margin:0 auto 5px;display:block;}
+
+/* MODAL */
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.72);backdrop-filter:blur(7px);z-index:999;align-items:center;justify-content:center;padding:16px;}
+.mo.on{display:flex;}
+.mdl{background:var(--bg2);border:1px solid var(--br2);border-radius:16px;width:100%;max-width:440px;max-height:92vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.8);animation:mIn .22s ease;}
+@keyframes mIn{from{opacity:0;transform:scale(.95) translateY(-8px);}to{opacity:1;transform:scale(1) translateY(0);}}
+.mhdr{padding:16px 20px;border-bottom:1px solid var(--br);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.mt{font-size:15px;font-weight:700;}
+.mx{width:28px;height:28px;border-radius:6px;background:rgba(255,255,255,0.05);border:none;cursor:pointer;color:var(--t2);font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.mx:hover{background:rgba(224,90,90,0.15);color:var(--red);}
+.mbody{padding:18px 20px;overflow-y:auto;flex:1;}
+.mfoot{padding:14px 20px;border-top:1px solid var(--br);display:flex;gap:8px;justify-content:flex-end;flex-shrink:0;}
+
+/* SELL MODAL */
+.sp{background:var(--bg3);border:1px solid var(--br2);border-radius:10px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;gap:12px;flex-wrap:nowrap;}
+.sp-img{width:48px;height:48px;min-width:48px;border-radius:8px;background:var(--bg);border:1px solid var(--br);display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden;flex-shrink:0;}
+.sp-img img{width:100%;height:100%;object-fit:cover;}
+.sp-name{font-size:14px;font-weight:800;}
+.sp-cat{font-size:11px;color:var(--gold);margin-top:2px;}
+.sp-nums{display:flex;gap:16px;margin-top:7px;}
+.spn{text-align:center;}
+.spn-v{font-size:17px;font-weight:900;line-height:1;}
+.spn-l{font-size:9px;color:var(--t3);margin-top:2px;}
+.qty-ctl{display:flex;align-items:center;background:var(--bg);border:1px solid var(--br2);border-radius:10px;overflow:hidden;height:50px;}
+.qty-btn{width:50px;height:50px;border:none;cursor:pointer;font-size:22px;font-weight:700;flex-shrink:0;transition:background .15s;}
+.qp{background:rgba(212,168,67,0.08);color:var(--gold);border-right:1px solid var(--br);}
+.qp:hover{background:rgba(212,168,67,0.2);}
+.qm{background:rgba(224,90,90,0.08);color:var(--red);border-left:1px solid var(--br);}
+.qm:hover{background:rgba(224,90,90,0.2);}
+.qty-inp{flex:1;height:50px;border:none;outline:none;background:transparent;text-align:center;font-family:'Cairo',sans-serif;font-size:24px;font-weight:900;color:var(--red);}
+.cbox{border:1px solid var(--br);border-radius:10px;padding:12px 14px;margin-top:12px;}
+.cbox-lbl{font-size:11px;font-weight:700;color:var(--gold);margin-bottom:10px;}
+
+/* RECEIPT */
+.r-row{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-bottom:1px solid var(--br);background:var(--bg3);}
+.r-row:nth-child(even){background:var(--bg2);}
+.r-lbl{font-size:11px;color:var(--t2);}
+.r-val{font-size:13px;font-weight:700;color:var(--t1);}
+
+/* LOG */
+.log-item{background:var(--bg3);border:1px solid var(--br);border-radius:12px;overflow:hidden;margin-bottom:8px;transition:border-color .2s;}
+.log-item:hover{border-color:var(--br2);}
+.log-head{padding:8px 14px;background:rgba(212,168,67,0.04);border-bottom:1px solid var(--br);display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.log-txid{font-family:monospace;font-size:11px;font-weight:800;letter-spacing:1.5px;background:rgba(212,168,67,0.12);border:1px solid rgba(212,168,67,0.3);color:var(--gold);padding:2px 10px;border-radius:5px;}
+.log-body{padding:10px 14px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+.log-info{display:flex;flex-direction:column;gap:5px;flex:1;min-width:0;}
+.log-name{font-size:14px;font-weight:800;color:var(--t1);}
+.log-cat{font-size:11px;color:var(--gold);}
+.log-right{display:flex;flex-direction:column;align-items:flex-end;gap:7px;flex-shrink:0;}
+.log-badge{background:rgba(224,90,90,0.13);color:var(--red);border:1px solid rgba(224,90,90,0.26);font-size:13px;font-weight:800;padding:4px 14px;border-radius:20px;white-space:nowrap;}
+
+/* MUHAS */
+.mtbl{width:100%;border-collapse:collapse;}
+.mtbl th{background:var(--bg3);padding:10px 14px;text-align:right;font-size:11px;font-weight:700;color:var(--t2);border-bottom:1px solid var(--br);}
+.mtbl td{padding:10px 14px;border-bottom:1px solid var(--br);font-size:13px;vertical-align:middle;}
+.mtbl tr:last-child td{border-bottom:none;}
+.mtbl tr:hover td{background:rgba(255,255,255,0.015);}
+.pbar{height:5px;background:var(--bg3);border-radius:3px;overflow:hidden;min-width:90px;}
+.pbf{height:100%;border-radius:3px;transition:width .4s;}
+.ph{background:var(--green);}.pm{background:var(--gold);}.pl{background:var(--red);}
+
+/* TOAST */
+.toasts{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:3000;display:flex;flex-direction:column;gap:7px;align-items:center;}
+.toast{background:var(--bg3);border:1px solid var(--br2);border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;box-shadow:0 8px 24px rgba(0,0,0,0.6);animation:tIn .28s ease;min-width:240px;}
+@keyframes tIn{from{opacity:0;transform:translateY(18px) scale(.95);}to{opacity:1;transform:translateY(0) scale(1);}}
+.toast.s{border-color:var(--green);color:var(--green);}
+.toast.e{border-color:var(--red);color:var(--red);}
+.toast.i{border-color:var(--blue);color:var(--blue);}
+.toast.w{border-color:var(--gold);color:var(--gold);}
+
+/* EMPTY */
+.empty{text-align:center;padding:52px 20px;color:var(--t3);}
+.empty-ico{font-size:44px;margin-bottom:10px;}
+.empty p{font-size:14px;}
+
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-thumb{background:var(--br2);border-radius:3px;}
+@media(max-width:680px){
+  .main{padding:14px;}.hdr{padding:0 14px;}.tabs{padding:10px 14px 0;}
+  .cats-grid{grid-template-columns:1fr;}.subs-grid{grid-template-columns:1fr 1fr;}
+  .stats{grid-template-columns:1fr 1fr;}.frow{grid-template-columns:1fr;}
+  .mdl{max-width:100%!important;margin:8px;border-radius:12px;}
+  .sp-nums{gap:10px;}
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-brand">
+    <div class="hdr-logo">ر</div>
+    <div>
+      <div class="hdr-title">محل الريان لتجهيز المحلات</div>
+      <div class="hdr-sub">نظام إدارة المخزن</div>
+    </div>
+  </div>
+  <div class="hdr-date" id="hdrDate"></div>
+</header>
+
+<nav class="tabs">
+  <button class="tab on" id="tab-stock" onclick="goPage('stock')">📦 المخزن <span class="tbadge" id="catBadge">0</span></button>
+  <button class="tab" id="tab-muhas" onclick="goPage('muhas')">📊 محصلة العام</button>
+</nav>
+
+<main class="main">
+  <div class="page on" id="page-stock">
+    <div class="stats" id="statsBar"></div>
+    <div id="vCats">
+      <div class="sec">
+        <div class="sec-t">🗂️ الفئات <span class="sec-s" id="catCount"></span></div>
+        <button class="btn btn-gold" onclick="openM('mAddCat')">＋ فئة جديدة</button>
+      </div>
+      <div class="cats-grid" id="catsGrid"></div>
+    </div>
+    <div id="vSubs" style="display:none;">
+      <div class="back" onclick="backToCats()">← العودة للفئات</div>
+      <div class="sec">
+        <div class="sec-t"><span id="curCatIcon">📦</span> <span id="curCatName" style="color:var(--gold)"></span> — التصنيفات</div>
+        <button class="btn btn-gold" onclick="openM('mAddSub')">＋ تصنيف جديد</button>
+      </div>
+      <div class="subs-grid" id="subsGrid"></div>
+    </div>
+  </div>
+
+  <div class="page" id="page-muhas">
+    <div class="sec">
+      <div class="sec-t">📊 محصلة العام <span class="sec-s">تقرير شامل</span></div>
+      <button class="btn btn-ghost btn-sm" onclick="exportTxt()">⬇ تصدير</button>
+    </div>
+    <div class="stats" id="mStats"></div>
+    <div id="mTables"></div>
+    <div class="sec" style="margin-top:28px;">
+      <div class="sec-t">🧾 سجل المبيعات <span class="sec-s" id="logCount"></span></div>
+      <button class="btn btn-ghost btn-sm" onclick="clearLog()">🗑 مسح السجل</button>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--br);border-radius:14px;padding:16px;">
+      <div id="logList"></div>
+    </div>
+  </div>
+</main>
+
+<!-- ADD CAT -->
+<div class="mo" id="mAddCat">
+  <div class="mdl">
+    <div class="mhdr"><div class="mt">🗂️ فئة جديدة</div><button class="mx" onclick="closeM('mAddCat')">✕</button></div>
+    <div class="mbody">
+      <div class="fg"><label class="fl">اسم الفئة *</label><input class="fi" id="iCatName" placeholder="مثال: أرفف، صواني..."></div>
+      <div class="fg"><label class="fl">رمز (اختياري)</label><input class="fi" id="iCatIcon" placeholder="📦" maxlength="4"></div>
+    </div>
+    <div class="mfoot"><button class="btn btn-ghost" onclick="closeM('mAddCat')">إلغاء</button><button class="btn btn-gold" onclick="addCat()">إضافة</button></div>
+  </div>
+</div>
+
+<!-- EDIT CAT -->
+<div class="mo" id="mEditCat">
+  <div class="mdl">
+    <div class="mhdr"><div class="mt">✏️ تعديل الفئة</div><button class="mx" onclick="closeM('mEditCat')">✕</button></div>
+    <div class="mbody">
+      <input type="hidden" id="eCatId">
+      <div class="fg"><label class="fl">اسم الفئة *</label><input class="fi" id="eCatName"></div>
+      <div class="fg"><label class="fl">رمز</label><input class="fi" id="eCatIcon" maxlength="4"></div>
+    </div>
+    <div class="mfoot"><button class="btn btn-ghost" onclick="closeM('mEditCat')">إلغاء</button><button class="btn btn-gold" onclick="saveEditCat()">حفظ</button></div>
+  </div>
+</div>
+
+<!-- ADD SUB -->
+<div class="mo" id="mAddSub">
+  <div class="mdl">
+    <div class="mhdr"><div class="mt">➕ تصنيف جديد</div><button class="mx" onclick="closeM('mAddSub')">✕</button></div>
+    <div class="mbody">
+      <div class="fg"><label class="fl">اسم التصنيف *</label><input class="fi" id="iSubName" placeholder="مثال: كبير، أحمر..."></div>
+      <div class="fg"><label class="fl">الكمية الأولية</label><input class="fi" type="number" id="iSubQty" value="0" min="0"></div>
+      <div class="fg">
+        <label class="fl">صورة توضيحية (اختياري)</label>
+        <div class="img-drop" id="addSubDrop">
+          <input type="file" accept="image/*" onchange="prevImg(this,'addSubDrop',0)">
+          <span class="img-drop-ico">🖼️</span>
+          <div class="img-drop-txt">اضغط لرفع صورة</div>
+        </div>
+      </div>
+    </div>
+    <div class="mfoot"><button class="btn btn-ghost" onclick="closeM('mAddSub')">إلغاء</button><button class="btn btn-gold" onclick="addSub()">إضافة</button></div>
+  </div>
+</div>
+
+<!-- EDIT SUB -->
+<div class="mo" id="mEditSub">
+  <div class="mdl">
+    <div class="mhdr"><div class="mt">✏️ تعديل التصنيف</div><button class="mx" onclick="closeM('mEditSub')">✕</button></div>
+    <div class="mbody">
+      <input type="hidden" id="eSubCatId"><input type="hidden" id="eSubId">
+      <div class="fg"><label class="fl">اسم التصنيف *</label><input class="fi" id="eSubName"></div>
+      <div class="fg"><label class="fl">الكمية</label><input class="fi" type="number" id="eSubQty" min="0"></div>
+      <div class="fg">
+        <label class="fl">صورة توضيحية</label>
+        <div class="img-drop" id="editSubDrop">
+          <input type="file" accept="image/*" onchange="prevImg(this,'editSubDrop',1)">
+          <span class="img-drop-ico">🖼️</span>
+          <div class="img-drop-txt">اضغط لتغيير الصورة</div>
+        </div>
+      </div>
+    </div>
+    <div class="mfoot"><button class="btn btn-ghost" onclick="closeM('mEditSub')">إلغاء</button><button class="btn btn-gold" onclick="saveEditSub()">حفظ</button></div>
+  </div>
+</div>
+
+<!-- ADD STOCK -->
+<div class="mo" id="mAddStock">
+  <div class="mdl" style="max-width:380px;">
+    <div class="mhdr"><div class="mt">📥 إضافة مخزون</div><button class="mx" onclick="closeM('mAddStock')">✕</button></div>
+    <div class="mbody">
       <div style="font-size:12px;color:var(--t2);margin-bottom:14px;" id="stockDesc"></div>
       <div class="fg"><label class="fl">الكمية المضافة *</label><input class="fi" type="number" id="iStockQty" value="1" min="1"></div>
       <input type="hidden" id="stockCatId"><input type="hidden" id="stockSubId">
