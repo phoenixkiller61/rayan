@@ -1174,9 +1174,44 @@
 
     function load() {
       try {
-        var raw = localStorage.getItem('rayan_v5');
-        if (raw) S = JSON.parse(raw);
+        /* Try keys newest → oldest for backward compatibility */
+        var raw = localStorage.getItem('rayan_v5')
+                || localStorage.getItem('rayan_v4')
+                || localStorage.getItem('rayan_v3');
+
+        if (raw) {
+          var parsed = JSON.parse(raw);
+
+          /* Normalise categories — old keys: 'categories' → new: 'cats' */
+          var rawCats = parsed.cats || parsed.categories || [];
+          S.cats = rawCats.map(function(cat) {
+
+            /* Old versions stored subs as 'subcategories' */
+            if (!cat.subs && cat.subcategories) cat.subs = cat.subcategories;
+            if (!Array.isArray(cat.subs)) cat.subs = [];
+
+            /* Normalise each sub: old used 'quantity' instead of 'qty' */
+            cat.subs = cat.subs.map(function(sub) {
+              if (sub.qty === undefined && sub.quantity !== undefined) {
+                sub.qty = sub.quantity;
+              }
+              if (sub.qty === undefined) sub.qty = 0;
+              if (sub.sold === undefined) sub.sold = 0;
+              return sub;
+            });
+
+            return cat;
+          });
+
+          /* Normalise log — old key: 'sellLog' → new: 'log' */
+          S.log = parsed.log || parsed.sellLog || [];
+          S.cur = null;
+
+          /* Migrate to new key so next load is instant */
+          save();
+        }
       } catch (e) { /* ignore corrupt data */ }
+
       if (!Array.isArray(S.cats)) S.cats = [];
       if (!Array.isArray(S.log))  S.log  = [];
     }
@@ -1232,8 +1267,8 @@
     function renderStats() {
       var cats  = S.cats;
       var nSubs = cats.reduce(function(a,c){ return a + (c.subs ? c.subs.length : 0); }, 0);
-      var stock = cats.reduce(function(a,c){ return a + (c.subs ? c.subs.reduce(function(b,s){ return b + s.qty; }, 0) : 0); }, 0);
-      var sold  = cats.reduce(function(a,c){ return a + (c.subs ? c.subs.reduce(function(b,s){ return b + (s.sold||0); }, 0) : 0); }, 0);
+      var stock = cats.reduce(function(a,c){ return a + (c.subs ? c.subs.reduce(function(b,s){ return b + (parseInt(s.qty)||0); }, 0) : 0); }, 0);
+      var sold  = cats.reduce(function(a,c){ return a + (c.subs ? c.subs.reduce(function(b,s){ return b + (parseInt(s.sold)||0); }, 0) : 0); }, 0);
 
       document.getElementById('statsBar').innerHTML =
         sc('g', 'الفئات',      cats.length, 'فئة')       +
