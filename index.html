@@ -140,13 +140,13 @@ input[type=number]{-moz-appearance:textfield;}
 .spn{text-align:center;}
 .spn-v{font-size:17px;font-weight:900;line-height:1;}
 .spn-l{font-size:9px;color:var(--t3);margin-top:2px;}
-.qty-ctl{display:flex;align-items:center;background:var(--bg);border:1px solid var(--br2);border-radius:10px;overflow:hidden;height:50px;}
-.qty-btn{width:50px;height:50px;border:none;cursor:pointer;font-size:22px;font-weight:700;flex-shrink:0;transition:background .15s;}
-.qp{background:rgba(212,168,67,0.08);color:var(--gold);border-right:1px solid var(--br);}
-.qp:hover{background:rgba(212,168,67,0.2);}
-.qm{background:rgba(224,90,90,0.08);color:var(--red);border-left:1px solid var(--br);}
-.qm:hover{background:rgba(224,90,90,0.2);}
-.qty-inp{flex:1;height:50px;border:none;outline:none;background:transparent;text-align:center;font-family:'Cairo',sans-serif;font-size:24px;font-weight:900;color:var(--red);}
+.qty-ctl{display:flex;align-items:center;background:var(--bg);border:1px solid var(--br2);border-radius:10px;overflow:hidden;height:52px;width:100%;}
+.qty-btn{width:52px;min-width:52px;height:52px;border:none;cursor:pointer;font-size:24px;font-weight:700;flex-shrink:0;transition:background .15s;display:flex;align-items:center;justify-content:center;}
+.qp{background:rgba(212,168,67,0.10);color:var(--gold);border-right:1px solid var(--br);}
+.qp:hover{background:rgba(212,168,67,0.22);}
+.qm{background:rgba(224,90,90,0.10);color:var(--red);border-left:1px solid var(--br);}
+.qm:hover{background:rgba(224,90,90,0.22);}
+.qty-inp{flex:1;min-width:0;height:52px;border:none;outline:none;background:transparent;text-align:center;font-family:'Cairo',sans-serif;font-size:26px;font-weight:900;color:var(--red);}
 .cbox{border:1px solid var(--br);border-radius:10px;padding:12px 14px;margin-top:12px;}
 .cbox-lbl{font-size:11px;font-weight:700;color:var(--gold);margin-bottom:10px;}
 
@@ -396,8 +396,8 @@ input[type=number]{-moz-appearance:textfield;}
           <div id="rTxId" style="font-family:monospace;font-size:20px;font-weight:900;letter-spacing:3px;color:var(--gold);background:rgba(212,168,67,0.08);border:1px solid rgba(212,168,67,0.25);border-radius:8px;padding:7px 16px;display:inline-block;"></div>
         </div>
         <div style="border:1px solid var(--br);border-radius:10px;overflow:hidden;margin-bottom:14px;">
-          <div class="r-row"><span class="r-lbl">📦 الصنف</span><span class="r-val" id="rSubName"></span></div>
           <div class="r-row"><span class="r-lbl">🗂️ الفئة</span><span class="r-val" id="rCatName"></span></div>
+          <div class="r-row"><span class="r-lbl">📦 الصنف</span><span class="r-val" id="rSubName"></span></div>
           <div class="r-row"><span class="r-lbl">🔢 الكمية</span><span class="r-val" id="rQty" style="color:var(--red);font-weight:800;"></span></div>
           <div class="r-row" style="border-bottom:none;"><span class="r-lbl">📅 التاريخ</span><span class="r-val" id="rDate"></span></div>
         </div>
@@ -852,8 +852,8 @@ function openReceiptWindow(){
 
   /* ── DETAILS ── */
   var rows = el('div','rows');
-  rows.appendChild(row('\u0627\u0644\u0635\u0646\u0641', sub));
   rows.appendChild(row('\u0627\u0644\u0641\u0626\u0629', cat));
+  rows.appendChild(row('\u0627\u0644\u0635\u0646\u0641', sub));
   rows.appendChild(row('\u0627\u0644\u0643\u0645\u064A\u0629', qty));
   rows.appendChild(row('\u0627\u0644\u062A\u0627\u0631\u064A\u062E', date));
 
