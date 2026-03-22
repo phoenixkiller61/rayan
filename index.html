@@ -213,6 +213,29 @@ input[type=number]{-moz-appearance:textfield;}
 .toast.i{border-color:var(--blue);color:var(--blue);}
 .toast.w{border-color:var(--gold);color:var(--gold);}
 
+/* SEARCH DROP */
+.sdrop-item{display:flex;align-items:center;gap:12px;padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--br);transition:background .15s;}
+.sdrop-item:last-child{border-bottom:none;}
+.sdrop-item:hover{background:rgba(212,168,67,0.06);}
+.sdrop-img{width:38px;height:38px;min-width:38px;border-radius:7px;background:var(--bg3);border:1px solid var(--br);display:flex;align-items:center;justify-content:center;font-size:17px;overflow:hidden;flex-shrink:0;}
+.sdrop-img img{width:100%;height:100%;object-fit:cover;}
+.sdrop-info{flex:1;min-width:0;}
+.sdrop-cat{font-size:10px;color:var(--gold);margin-bottom:1px;}
+.sdrop-name{font-size:13px;font-weight:700;color:var(--t1);}
+.sdrop-stock{font-size:11px;color:var(--t3);margin-top:1px;}
+.sdrop-add{background:rgba(230,126,34,0.15);border:1px solid rgba(230,126,34,0.3);color:#e67e22;font-size:11px;font-weight:700;padding:4px 10px;border-radius:7px;border:none;cursor:pointer;white-space:nowrap;font-family:'Cairo',sans-serif;transition:background .15s;}
+.sdrop-add:hover{background:rgba(230,126,34,0.28);}
+.sdrop-header{padding:8px 14px;font-size:10px;font-weight:700;color:var(--t3);letter-spacing:1px;border-bottom:1px solid var(--br);background:rgba(0,0,0,.2);}
+
+/* SEARCH DROP CART QTY */
+.sdrop-qty{display:flex;align-items:center;gap:0;background:var(--bg);border:1px solid var(--br2);border-radius:7px;overflow:hidden;height:30px;}
+.sdrop-qty-btn{width:28px;height:30px;border:none;cursor:pointer;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:background .15s;}
+.sdrop-qty-p{background:rgba(212,168,67,0.08);color:var(--gold);border-right:1px solid var(--br);}
+.sdrop-qty-p:hover{background:rgba(212,168,67,0.2);}
+.sdrop-qty-m{background:rgba(224,90,90,0.08);color:var(--red);border-left:1px solid var(--br);}
+.sdrop-qty-m:hover{background:rgba(224,90,90,0.2);}
+.sdrop-qty-n{width:34px;text-align:center;font-size:13px;font-weight:800;color:var(--red);border:none;outline:none;background:transparent;font-family:'Cairo',sans-serif;}
+
 /* EMPTY */
 .empty{text-align:center;padding:52px 20px;color:var(--t3);}
 .empty-ico{font-size:44px;margin-bottom:10px;}
@@ -220,11 +243,19 @@ input[type=number]{-moz-appearance:textfield;}
 
 ::-webkit-scrollbar{width:5px;height:5px;}
 ::-webkit-scrollbar-thumb{background:var(--br2);border-radius:3px;}
+/* على الكمبيوتر: بحث الهيدر ظاهر، بحث الموبايل مخفي */
+.hdr-search-wrap { display: block; }
+.mobile-search-bar { display: none; }
+
 @media(max-width:680px){
   .main{padding:14px;}.hdr{padding:0 14px;}.tabs{padding:10px 14px 0;}
   .cats-grid{grid-template-columns:1fr;}.subs-grid{grid-template-columns:1fr 1fr;}
   .stats{grid-template-columns:1fr 1fr;}.frow{grid-template-columns:1fr;}
   .mdl{max-width:100%!important;margin:8px;border-radius:12px;}
+  /* على الموبايل: بحث الهيدر مخفي، بحث الصفحة ظاهر */
+  .hdr-search-wrap { display: none !important; }
+  .mobile-search-bar { display: block; }
+  .hdr-date { display: none; }
 }
 </style>
 </head>
@@ -238,7 +269,13 @@ input[type=number]{-moz-appearance:textfield;}
       <div class="hdr-sub">نظام إدارة المخزن</div>
     </div>
   </div>
-  <div style="display:flex;align-items:center;gap:12px;">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <!-- بحث مركزي — يظهر فقط على الكمبيوتر -->
+    <div style="position:relative;" class="hdr-search-wrap">
+      <span style="position:absolute;right:11px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--t3);pointer-events:none;">🔍</span>
+      <input id="globalSearch" class="fi" placeholder="بحث للسلة..." oninput="globalSearchFn()" onfocus="showSearchDrop()" onblur="hideSearchDrop()" style="padding-right:32px;background:var(--bg3);border-color:var(--br);width:200px;font-size:12px;" autocomplete="off">
+      <div id="searchDrop" style="display:none;position:absolute;top:calc(100% + 6px);right:0;width:320px;background:var(--bg2);border:1px solid var(--br2);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.6);z-index:500;max-height:360px;overflow-y:auto;"></div>
+    </div>
     <div class="hdr-cart" onclick="openM('mCart')" id="hdrCart" style="display:none;">
       <span>🛒</span>
       <span id="cartCountHdr">0</span>
@@ -257,10 +294,23 @@ input[type=number]{-moz-appearance:textfield;}
 <main class="main">
   <div class="page on" id="page-stock">
     <div class="stats" id="statsBar"></div>
+
+    <!-- بحث للسلة — يظهر على الموبايل فقط -->
+    <div class="mobile-search-bar" style="position:relative;margin-bottom:18px;">
+      <span style="position:absolute;right:13px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--t3);pointer-events:none;">🔍</span>
+      <input id="globalSearch2" class="fi" placeholder="ابحث عن تصنيف أو فئة للإضافة للسلة..." oninput="globalSearchFn2()" onfocus="showSearchDrop2()" onblur="hideSearchDrop2()" style="padding-right:38px;background:var(--bg2);" autocomplete="off">
+      <div id="searchDrop2" style="display:none;position:absolute;top:calc(100% + 6px);right:0;left:0;background:var(--bg2);border:1px solid var(--br2);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.6);z-index:500;max-height:360px;overflow-y:auto;"></div>
+    </div>
+
     <div id="vCats">
       <div class="sec">
         <div class="sec-t">🗂️ الفئات <span class="sec-s" id="catCount"></span></div>
         <button class="btn btn-gold" onclick="openM('mAddCat')">＋ فئة جديدة</button>
+      </div>
+      <!-- بحث الفئات -->
+      <div style="position:relative;margin-bottom:18px;">
+        <span style="position:absolute;right:13px;top:50%;transform:translateY(-50%);font-size:15px;color:var(--t3);pointer-events:none;">🔍</span>
+        <input id="searchCats" class="fi" placeholder="ابحث عن فئة..." oninput="filterCats()" style="padding-right:38px;background:var(--bg2);">
       </div>
       <div class="cats-grid" id="catsGrid"></div>
     </div>
@@ -269,6 +319,11 @@ input[type=number]{-moz-appearance:textfield;}
       <div class="sec">
         <div class="sec-t"><span id="curCatIcon">📦</span> <span id="curCatName" style="color:var(--gold)"></span> — التصنيفات</div>
         <button class="btn btn-gold" onclick="openM('mAddSub')">＋ تصنيف جديد</button>
+      </div>
+      <!-- بحث التصنيفات -->
+      <div style="position:relative;margin-bottom:18px;">
+        <span style="position:absolute;right:13px;top:50%;transform:translateY(-50%);font-size:15px;color:var(--t3);pointer-events:none;">🔍</span>
+        <input id="searchSubs" class="fi" placeholder="ابحث عن تصنيف..." oninput="filterSubs()" style="padding-right:38px;background:var(--bg2);">
       </div>
       <div class="subs-grid" id="subsGrid"></div>
     </div>
@@ -556,21 +611,28 @@ function renderStats(){
 }
 
 /* ── CATEGORIES ── */
-function renderCats(){
+function renderCats(filter){
   var grid=document.getElementById('catsGrid');
   var cats=S.cats;
+  var q=(filter||'').trim().toLowerCase();
+  var filtered=q?cats.filter(function(c){return c.name.toLowerCase().indexOf(q)!==-1;}):cats;
   document.getElementById('catCount').textContent=cats.length?'('+cats.length+')':'';
-  if(!cats.length){grid.innerHTML='<div class="empty" style="grid-column:1/-1;"><div class="empty-ico">📦</div><p>لا توجد فئات</p></div>';renderStats();return;}
+  if(!filtered.length){
+    grid.innerHTML='<div class="empty" style="grid-column:1/-1;"><div class="empty-ico">'+(q?'🔍':'📦')+'</div><p>'+(q?'لا توجد نتائج للبحث عن "'+esc(q)+'"':'لا توجد فئات')+'</p></div>';
+    if(!q)renderStats();return;
+  }
   var h='';
-  cats.forEach(function(cat,i){
-    var c=COLS[i%COLS.length],subs=cat.subs||[];
+  filtered.forEach(function(cat,i){
+    var origIdx=cats.indexOf(cat);
+    var c=COLS[origIdx%COLS.length],subs=cat.subs||[];
     var stk=subs.reduce(function(a,s){return a+s.qty;},0);
     var sld=subs.reduce(function(a,s){return a+(s.sold||0);},0);
+    var nameHtml=q?highlight(cat.name,q):esc(cat.name);
     h+='<div class="cat-card" onclick="openCat(\''+cat.id+'\')">'+
       '<div class="cat-top"><div class="cat-nr">'+
         '<div class="cat-dot" style="background:'+c+';box-shadow:0 0 7px '+c+';"></div>'+
         '<span style="font-size:17px;">'+esc(cat.icon||'📦')+'</span>'+
-        '<div class="cat-name">'+esc(cat.name)+'</div></div>'+
+        '<div class="cat-name">'+nameHtml+'</div></div>'+
       '<div class="cat-acts" onclick="event.stopPropagation()">'+
         '<button class="btn btn-ghost btn-xs" onclick="openEditCat(\''+cat.id+'\')">✏️</button>'+
         '<button class="btn btn-red btn-xs" onclick="confirmDelCat(\''+cat.id+'\')">🗑</button>'+
@@ -583,6 +645,138 @@ function renderCats(){
   });
   grid.innerHTML=h; renderStats();
 }
+
+function filterCats(){
+  var q=document.getElementById('searchCats').value;
+  renderCats(q);
+}
+
+function highlight(text,q){
+  var t=esc(text);
+  var qe=q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  return t.replace(new RegExp('('+qe+')','gi'),'<mark style="background:rgba(212,168,67,0.3);color:var(--gold);border-radius:3px;padding:0 2px;">$1</mark>');
+}
+
+/* ── GLOBAL SEARCH ── */
+var _sdropQtys = {}; // subId -> qty
+
+function globalSearchFn(){
+  var q=document.getElementById('globalSearch').value.trim().toLowerCase();
+  var drop=document.getElementById('searchDrop');
+  if(!q){drop.style.display='none';return;}
+  drop.style.display='block';
+  drop.innerHTML=buildSearchHTML(q,'');
+}
+
+function sdQtyChange(subId,d,max){
+  if(!_sdropQtys[subId]) _sdropQtys[subId]=1;
+  _sdropQtys[subId]=Math.max(1,Math.min(_sdropQtys[subId]+d,max));
+  var inp=document.getElementById('sdq_'+subId);
+  if(inp) inp.value=_sdropQtys[subId];
+}
+function sdQtyInput(subId,max){
+  var inp=document.getElementById('sdq_'+subId);
+  if(!inp) return;
+  var v=parseInt(inp.value)||1;
+  if(v<1)v=1; if(v>max){v=max;}
+  _sdropQtys[subId]=v; inp.value=v;
+}
+function sdAddToCart(catId,subId){
+  var cat=S.cats.find(function(c){return c.id===catId;});
+  var sub=cat?cat.subs.find(function(s){return s.id===subId;}):null;if(!sub)return;
+  var qty=_sdropQtys[subId]||1;
+  var existing=cart.find(function(ci){return ci.subId===subId;});
+  var total=existing?existing.qty+qty:qty;
+  if(total>sub.qty){toast('الكمية تتجاوز المخزون!','e');return;}
+  if(existing){existing.qty+=qty;}
+  else{cart.push({catId:catId,subId:subId,catName:cat.name,subName:sub.name,qty:qty,img:sub.img||null,icon:cat.icon||'📦'});}
+  _sdropQtys[subId]=1;
+  updateCartUI();
+  globalSearchFn();
+  globalSearchFn2();
+  if(S.cur) renderSubs(S.cur);
+  toast('🛒 تمت إضافة '+qty+' × '+sub.name+' للسلة','s');
+}
+
+function showSearchDrop(){
+  var q=document.getElementById('globalSearch').value.trim();
+  if(q) document.getElementById('searchDrop').style.display='block';
+}
+function hideSearchDrop(){
+  setTimeout(function(){document.getElementById('searchDrop').style.display='none';},200);
+}
+function globalSearchFn2(){
+  var q=document.getElementById('globalSearch2').value.trim().toLowerCase();
+  var drop=document.getElementById('searchDrop2');
+  if(!q){drop.style.display='none';return;}
+  drop.style.display='block';
+  drop.innerHTML=buildSearchHTML(q,'2');
+}
+function showSearchDrop2(){
+  var q=document.getElementById('globalSearch2').value.trim();
+  if(q) document.getElementById('searchDrop2').style.display='block';
+}
+function hideSearchDrop2(){
+  setTimeout(function(){document.getElementById('searchDrop2').style.display='none';},200);
+}
+
+// دالة مشتركة لبناء نتائج البحث
+function buildSearchHTML(q, suffix){
+  var results=[];
+  S.cats.forEach(function(cat,ci){
+    (cat.subs||[]).forEach(function(sub){
+      if(cat.name.toLowerCase().indexOf(q)!==-1 || sub.name.toLowerCase().indexOf(q)!==-1){
+        results.push({cat:cat,sub:sub,ci:ci});
+      }
+    });
+  });
+  if(!results.length) return '<div style="padding:20px;text-align:center;color:var(--t3);font-size:13px;">لا توجد نتائج</div>';
+  var h='<div class="sdrop-header">'+results.length+' نتيجة — اختر الكمية ثم أضف للسلة</div>';
+  results.forEach(function(r){
+    var sub=r.sub,cat=r.cat;
+    var inCartQty=0;
+    cart.forEach(function(ci){if(ci.subId===sub.id)inCartQty=ci.qty;});
+    var available=sub.qty-inCartQty;
+    var imgH=sub.img?'<img src="'+sub.img+'">':(cat.icon||'📦');
+    if(!_sdropQtys[sub.id]) _sdropQtys[sub.id]=1;
+    var curQty=_sdropQtys[sub.id];
+    var catNameH=cat.name.toLowerCase().indexOf(q)!==-1?highlight(cat.name,q):esc(cat.name);
+    var subNameH=sub.name.toLowerCase().indexOf(q)!==-1?highlight(sub.name,q):esc(sub.name);
+    h+='<div class="sdrop-item">'+
+      '<div class="sdrop-img">'+imgH+'</div>'+
+      '<div class="sdrop-info">'+
+        '<div class="sdrop-cat">'+catNameH+'</div>'+
+        '<div class="sdrop-name">'+subNameH+'</div>'+
+        '<div class="sdrop-stock">'+(available>0?'متاح: '+available+' قطعة':'<span style="color:var(--red);">نفد المخزون</span>')+(inCartQty?' · في السلة: '+inCartQty:'')+'</div>'+
+      '</div>'+
+      (available>0?
+        '<div style="display:flex;flex-direction:column;align-items:center;gap:5px;">'+
+          '<div class="sdrop-qty" style="direction:ltr;">'+
+            '<button class="sdrop-qty-btn sdrop-qty-m" onclick="sdQtyChange(\''+sub.id+'\','+(-1)+','+available+')">−</button>'+
+            '<input class="sdrop-qty-n" type="number" id="sdq_'+sub.id+suffix+'" value="'+curQty+'" min="1" max="'+available+'" oninput="sdQtyInput(\''+sub.id+'\','+available+')">'+
+            '<button class="sdrop-qty-btn sdrop-qty-p" onclick="sdQtyChange(\''+sub.id+'\',1,'+available+')">＋</button>'+
+          '</div>'+
+          '<button class="sdrop-add" onclick="sdAddToCart(\''+cat.id+'\',\''+sub.id+'\')">🛒 إضافة</button>'+
+        '</div>'
+      :'')+
+    '</div>';
+  });
+  return h;
+}
+
+// إغلاق كلا الـ dropdown عند الضغط خارجهما
+document.addEventListener('click',function(ev){
+  var wrap1=document.getElementById('globalSearch');
+  var drop1=document.getElementById('searchDrop');
+  if(wrap1&&drop1&&!wrap1.contains(ev.target)&&!drop1.contains(ev.target)){
+    drop1.style.display='none';
+  }
+  var wrap2=document.getElementById('globalSearch2');
+  var drop2=document.getElementById('searchDrop2');
+  if(wrap2&&drop2&&!wrap2.contains(ev.target)&&!drop2.contains(ev.target)){
+    drop2.style.display='none';
+  }
+});
 
 function addCat(){
   var name=document.getElementById('iCatName').value.trim();
@@ -626,29 +820,37 @@ function openCat(id){
   document.getElementById('vSubs').style.display='block';
   document.getElementById('curCatName').textContent=cat.name;
   document.getElementById('curCatIcon').textContent=cat.icon||'📦';
+  document.getElementById('searchSubs').value='';
   renderSubs(id);
 }
 function backToCats(){
   document.getElementById('vCats').style.display='block';
   document.getElementById('vSubs').style.display='none';
   S.cur=null;
+  // أبقِ قيمة البحث كما هي
 }
-function renderSubs(catId){
+function renderSubs(catId, filter){
   var cat=S.cats.find(function(c){return c.id===catId;});if(!cat)return;
   var grid=document.getElementById('subsGrid');
   var subs=cat.subs||[];
-  if(!subs.length){grid.innerHTML='<div class="empty" style="grid-column:1/-1;"><div class="empty-ico">🏷️</div><p>لا توجد تصنيفات</p></div>';return;}
+  var q=(filter||'').trim().toLowerCase();
+  var filtered=q?subs.filter(function(s){return s.name.toLowerCase().indexOf(q)!==-1;}):subs;
+  if(!filtered.length){
+    grid.innerHTML='<div class="empty" style="grid-column:1/-1;"><div class="empty-ico">'+(q?'🔍':'🏷️')+'</div><p>'+(q?'لا توجد نتائج للبحث عن "'+esc(q)+'"':'لا توجد تصنيفات')+'</p></div>';
+    return;
+  }
   var h='';
-  subs.forEach(function(sub){
+  filtered.forEach(function(sub){
     var inCart=cart.some(function(ci){return ci.subId===sub.id;});
     var cartQty=0;
     cart.forEach(function(ci){if(ci.subId===sub.id)cartQty=ci.qty;});
     var imgH=sub.img?'<img src="'+sub.img+'">':"<span style=\"font-size:42px;\">"+esc(cat.icon||'📦')+"</span>";
+    var nameHtml=q?highlight(sub.name,q):esc(sub.name);
     h+='<div class="sub-card'+(inCart?' in-cart':'')+'">'+
       '<div class="sub-img">'+imgH+'</div>'+
       '<div class="sub-body">'+
         '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">'+
-          '<div class="sub-name">'+esc(sub.name)+'</div>'+
+          '<div class="sub-name">'+nameHtml+'</div>'+
           (inCart?'<div style="background:rgba(0,201,177,0.15);color:var(--teal);border:1px solid rgba(0,201,177,0.3);font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px;">🛒 '+cartQty+'</div>':'')+
         '</div>'+
         '<div class="sub-row">'+
@@ -669,6 +871,11 @@ function renderSubs(catId){
       '</div></div>';
   });
   grid.innerHTML=h;
+}
+function filterSubs(){
+  if(!S.cur) return;
+  var q=document.getElementById('searchSubs').value;
+  renderSubs(S.cur, q);
 }
 function addSub(){
   var name=document.getElementById('iSubName').value.trim();
