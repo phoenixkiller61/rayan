@@ -2670,6 +2670,16 @@
       page.appendChild(foot);
 
       d.body.appendChild(page);
+
+      /* ── Use Blob URL so print dialog shows a real URL, not about:blank ── */
+      var html = '<!DOCTYPE html><html lang="ar" dir="rtl">' + d.head.outerHTML + '<body>' + d.body.innerHTML + '</body></html>';
+      var blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+      var url  = URL.createObjectURL(blob);
+      w.close();
+      var w2 = window.open(url, '_blank');
+      if (!w2) { toast('السماح بالنوافذ المنبثقة مطلوب', 'w'); return; }
+      /* Revoke the Blob URL after the window has loaded */
+      w2.addEventListener('load', function(){ URL.revokeObjectURL(url); });
       toast('\uD83D\uDDB8\uFE0F \u062A\u0645 \u0641\u062A\u062D \u0646\u0627\u0641\u0630\u0629 \u0627\u0644\u0637\u0628\u0627\u0639\u0629', 's');
     }
 
