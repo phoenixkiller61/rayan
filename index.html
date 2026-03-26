@@ -2547,303 +2547,168 @@
     /** Open a professional print-ready annual report in a new window */
     function printAnnualReport() {
       var cats  = S.cats;
-      var stock = cats.reduce(function(a,c){ return a + (c.subs||[]).reduce(function(b,s){ return b+(parseInt(s.qty)||0); },0); }, 0);
-      var sold  = cats.reduce(function(a,c){ return a + (c.subs||[]).reduce(function(b,s){ return b+(parseInt(s.sold)||0); },0); }, 0);
+      var stock = cats.reduce(function(a,c){ return a+(c.subs||[]).reduce(function(b,s){ return b+(parseInt(s.qty)||0); },0); },0);
+      var sold  = cats.reduce(function(a,c){ return a+(c.subs||[]).reduce(function(b,s){ return b+(parseInt(s.sold)||0); },0); },0);
       var total = stock + sold;
       var pct   = total ? Math.round(sold/total*100) : 0;
-      var date  = new Date().toLocaleDateString('ar-SA', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+      var date  = new Date().toLocaleDateString('ar-SA',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+      var COLS  = ['#d4a843','#3a7bd5','#00c9b1','#e05a5a','#9b59b6','#27ae60','#e67e22','#1abc9c','#e91e63','#00bcd4'];
 
-      var w = window.open('', '_blank');
-      if (!w) { toast('السماح بالنوافذ المنبثقة مطلوب', 'w'); return; }
+      /* ── Helper: escape HTML ── */
+      function h(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-      var d = w.document;
-      d.open();
-      d.write('<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>تقرير سنوي</title></head><body></body></html>');
-      d.close();
+      /* ── Build HTML string ── */
+      var html = '<!DOCTYPE html><html lang="ar" dir="rtl"><head>' +
+        '<meta charset="UTF-8"><title>\u062A\u0642\u0631\u064A\u0631 \u0633\u0646\u0648\u064A</title>' +
+        '<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">' +
+        '<style>' +
+          '*{margin:0;padding:0;box-sizing:border-box;}' +
+          'body{font-family:Cairo,sans-serif;background:#f4f4f4;color:#111;padding:32px 24px;}' +
+          '.page{max-width:860px;margin:0 auto;}' +
+          '.rpt-head{display:flex;align-items:center;justify-content:space-between;padding-bottom:16px;border-bottom:3px double #222;margin-bottom:24px;}' +
+          '.rpt-brand{display:flex;align-items:center;gap:14px;}' +
+          '.rpt-logo{width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,#d4a843,#e8b040);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#080810;}' +
+          '.rpt-title{font-size:18px;font-weight:900;}' +
+          '.rpt-sub{font-size:11px;color:#666;margin-top:2px;}' +
+          '.rpt-date{font-size:11px;color:#888;}' +
+          '.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px;}' +
+          '.sc{background:#fff;border:1px solid #ddd;border-radius:8px;padding:14px;text-align:center;}' +
+          '.sc-lbl{font-size:10px;color:#888;margin-bottom:5px;}' +
+          '.sc-val{font-size:24px;font-weight:900;}' +
+          '.sc-sub{font-size:10px;color:#aaa;margin-top:3px;}' +
+          '.sc.g .sc-val{color:#b8860b;} .sc.b .sc-val{color:#2980b9;} .sc.r .sc-val{color:#c0392b;} .sc.t .sc-val{color:#16a085;}' +
+          '.sec{margin-bottom:24px;}' +
+          '.sec-hdr{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#222;color:#fff;border-radius:8px 8px 0 0;font-size:13px;font-weight:700;}' +
+          '.sec-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}' +
+          '.sec-sum{margin-right:auto;font-size:11px;font-weight:400;color:#aaa;}' +
+          '.tbl-wrap{border:1px solid #ddd;border-radius:0 0 8px 8px;overflow:hidden;}' +
+          'table{width:100%;border-collapse:collapse;background:#fff;}' +
+          'th{background:#f0f0f0;padding:9px 12px;text-align:right;font-size:11px;font-weight:700;color:#555;border-bottom:2px solid #ddd;}' +
+          'td{padding:9px 12px;font-size:12px;border-bottom:1px solid #f0f0f0;vertical-align:middle;}' +
+          'tr:last-child td{border-bottom:none;} tr:hover td{background:#fafafa;}' +
+          '.pbar{height:6px;background:#eee;border-radius:3px;overflow:hidden;min-width:80px;display:inline-block;vertical-align:middle;}' +
+          '.pbf{height:100%;border-radius:3px;display:block;}' +
+          '.ph{background:#27ae60;} .pm{background:#d4a843;} .pl{background:#e74c3c;}' +
+          '.no-data{padding:18px;text-align:center;color:#aaa;font-size:12px;background:#fff;}' +
+          '.foot{text-align:center;padding-top:20px;border-top:2px double #222;margin-top:28px;font-size:11px;color:#888;}' +
+          '.print-btn{display:block;margin:0 auto 28px;padding:10px 28px;background:#222;color:#fff;border:none;font-family:Cairo,sans-serif;font-size:13px;font-weight:700;border-radius:8px;cursor:pointer;}' +
+          '@media print{.print-btn{display:none!important;}body{background:#fff;padding:16px;}.stats{grid-template-columns:repeat(4,1fr);}}' +
+        '</style></head><body><div class="page">';
 
-      /* ── Styles ── */
-      var style = d.createElement('style');
-      style.textContent = [
-        '@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap");',
-        '*{margin:0;padding:0;box-sizing:border-box;}',
-        'body{font-family:Cairo,sans-serif;background:#f4f4f4;color:#111;padding:32px 24px;}',
-        '.page{max-width:860px;margin:0 auto;}',
+      /* Print button */
+      html += '<button class="print-btn" onclick="window.print()">\uD83D\uDDB8\uFE0F \u0637\u0628\u0627\u0639\u0629 \u0627\u0644\u062A\u0642\u0631\u064A\u0631</button>';
 
-        /* Header */
-        '.rpt-head{display:flex;align-items:center;justify-content:space-between;padding-bottom:16px;border-bottom:3px double #222;margin-bottom:24px;}',
-        '.rpt-logo{width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,#d4a843,#e8b040);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#080810;}',
-        '.rpt-brand{display:flex;align-items:center;gap:14px;}',
-        '.rpt-title{font-size:18px;font-weight:900;color:#111;}',
-        '.rpt-sub{font-size:11px;color:#666;margin-top:2px;}',
-        '.rpt-date{font-size:11px;color:#888;text-align:left;}',
+      /* Header */
+      html += '<div class="rpt-head">' +
+        '<div class="rpt-brand">' +
+          '<div class="rpt-logo">\u0631</div>' +
+          '<div><div class="rpt-title">\u0645\u062D\u0644 \u0627\u0644\u0631\u064A\u0627\u0646 \u0644\u062A\u062C\u0647\u064A\u0632 \u0627\u0644\u0645\u062D\u0644\u0627\u062A</div>' +
+          '<div class="rpt-sub">\u062A\u0642\u0631\u064A\u0631 \u0633\u0646\u0648\u064A \u0634\u0627\u0645\u0644</div></div>' +
+        '</div>' +
+        '<div class="rpt-date">' + h(date) + '</div>' +
+      '</div>';
 
-        /* Summary cards */
-        '.rpt-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px;}',
-        '.rpt-sc{background:#fff;border:1px solid #ddd;border-radius:8px;padding:14px 16px;text-align:center;}',
-        '.rpt-sc-lbl{font-size:10px;color:#888;margin-bottom:5px;}',
-        '.rpt-sc-val{font-size:24px;font-weight:900;}',
-        '.rpt-sc-sub{font-size:10px;color:#aaa;margin-top:3px;}',
-        '.rpt-sc.g .rpt-sc-val{color:#b8860b;}',
-        '.rpt-sc.r .rpt-sc-val{color:#c0392b;}',
-        '.rpt-sc.b .rpt-sc-val{color:#2980b9;}',
-        '.rpt-sc.t .rpt-sc-val{color:#16a085;}',
+      /* Stats */
+      html += '<div class="stats">' +
+        '<div class="sc g"><div class="sc-lbl">\u0627\u0644\u0641\u0626\u0627\u062A</div><div class="sc-val">' + cats.length + '</div><div class="sc-sub">\u0641\u0626\u0629</div></div>' +
+        '<div class="sc b"><div class="sc-lbl">\u0627\u0644\u0645\u062A\u0628\u0642\u064A</div><div class="sc-val">' + stock + '</div><div class="sc-sub">\u0642\u0637\u0639\u0629</div></div>' +
+        '<div class="sc r"><div class="sc-lbl">\u0627\u0644\u0645\u0628\u064A\u0639\u0627\u062A</div><div class="sc-val">' + sold + '</div><div class="sc-sub">\u0642\u0637\u0639\u0629</div></div>' +
+        '<div class="sc t"><div class="sc-lbl">\u0646\u0633\u0628\u0629 \u0627\u0644\u0628\u064A\u0639</div><div class="sc-val">' + pct + '%</div><div class="sc-sub">\u0645\u0646 \u0627\u0644\u0625\u062C\u0645\u0627\u0644\u064A</div></div>' +
+      '</div>';
 
-        /* Section */
-        '.rpt-sec{margin-bottom:24px;}',
-        '.rpt-sec-hdr{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#222;color:#fff;border-radius:8px 8px 0 0;font-size:13px;font-weight:700;}',
-        '.rpt-sec-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}',
-
-        /* Table */
-        'table{width:100%;border-collapse:collapse;background:#fff;}',
-        'th{background:#f0f0f0;padding:9px 12px;text-align:right;font-size:11px;font-weight:700;color:#555;border-bottom:2px solid #ddd;}',
-        'td{padding:9px 12px;font-size:12px;border-bottom:1px solid #f0f0f0;vertical-align:middle;}',
-        'tr:last-child td{border-bottom:none;}',
-        'tr:hover td{background:#fafafa;}',
-        '.tbl-wrap{border:1px solid #ddd;border-radius:0 0 8px 8px;overflow:hidden;}',
-
-        /* Progress bar */
-        '.pbar{height:6px;background:#eee;border-radius:3px;overflow:hidden;min-width:80px;}',
-        '.pbf{height:100%;border-radius:3px;}',
-        '.pbf.h{background:#27ae60;} .pbf.m{background:#d4a843;} .pbf.l{background:#e74c3c;}',
-
-        /* Footer */
-        '.rpt-foot{text-align:center;padding-top:20px;border-top:2px double #222;margin-top:28px;font-size:11px;color:#888;}',
-
-        /* Print */
-        '.print-btn{display:block;margin:0 auto 28px;padding:10px 28px;background:#222;color:#fff;border:none;font-family:Cairo,sans-serif;font-size:13px;font-weight:700;border-radius:8px;cursor:pointer;}',
-        '@media print{',
-        '  .print-btn{display:none!important;}',
-        '  body{background:#fff;padding:16px;}',
-        '  .rpt-stats{grid-template-columns:repeat(4,1fr);}',
-        '}'
-      ].join('');
-      d.head.appendChild(style);
-
-      /* ── DOM builder helpers ── */
-      function el(tag, cls, text) {
-        var e = d.createElement(tag);
-        if (cls)  e.className   = cls;
-        if (text !== undefined) e.textContent = text;
-        return e;
-      }
-      function append(parent) {
-        var children = Array.prototype.slice.call(arguments, 1);
-        children.forEach(function(c){ if(c) parent.appendChild(c); });
-        return parent;
-      }
-
-      var page = el('div','page');
-
-      /* ── Print button ── */
-      var printBtn = el('button','print-btn','\uD83D\uDDB8\uFE0F \u0637\u0628\u0627\u0639\u0629 \u0627\u0644\u062A\u0642\u0631\u064A\u0631');
-      printBtn.onclick = function(){ w.print(); };
-      page.appendChild(printBtn);
-
-      /* ── Header ── */
-      var head = el('div','rpt-head');
-      var brand = el('div','rpt-brand');
-      var logo  = el('div','rpt-logo', '\u0631');
-      var info  = el('div','');
-      var title = el('div','rpt-title', '\u0645\u062D\u0644 \u0627\u0644\u0631\u064A\u0627\u0646 \u0644\u062A\u062C\u0647\u064A\u0632 \u0627\u0644\u0645\u062D\u0644\u0627\u062A');
-      var sub   = el('div','rpt-sub',   '\u062A\u0642\u0631\u064A\u0631 \u0633\u0646\u0648\u064A \u0634\u0627\u0645\u0644');
-      append(info, title, sub);
-      append(brand, logo, info);
-      var dateEl = el('div','rpt-date', date);
-      append(head, brand, dateEl);
-      page.appendChild(head);
-
-      /* ── Summary stats ── */
-      var statsGrid = el('div','rpt-stats');
-      var sCols = [
-        {cls:'g', lbl:'\u0627\u0644\u0641\u0626\u0627\u062A',   val: cats.length,  sub:'\u0641\u0626\u0629'},
-        {cls:'b', lbl:'\u0627\u0644\u0645\u062A\u0628\u0642\u064A', val: stock,    sub:'\u0642\u0637\u0639\u0629'},
-        {cls:'r', lbl:'\u0627\u0644\u0645\u0628\u064A\u0639\u0627\u062A', val: sold, sub:'\u0642\u0637\u0639\u0629'},
-        {cls:'t', lbl:'\u0646\u0633\u0628\u0629 \u0627\u0644\u0628\u064A\u0639', val: pct+'%', sub:'\u0645\u0646 \u0627\u0644\u0625\u062C\u0645\u0627\u0644\u064A'}
-      ];
-      sCols.forEach(function(s){
-        var card = el('div','rpt-sc '+s.cls);
-        append(card, el('div','rpt-sc-lbl',s.lbl), el('div','rpt-sc-val',String(s.val)), el('div','rpt-sc-sub',s.sub));
-        statsGrid.appendChild(card);
-      });
-      page.appendChild(statsGrid);
-
-      /* ── Per-category sections ── */
-      var COLS = ['#d4a843','#3a7bd5','#00c9b1','#e05a5a','#9b59b6','#27ae60','#e67e22','#1abc9c','#e91e63','#00bcd4'];
-
+      /* Per-category tables */
       cats.forEach(function(cat, ci) {
-        var subs  = cat.subs || [];
-        var color = COLS[ci % COLS.length];
-        var catStock = subs.reduce(function(a,s){ return a+(parseInt(s.qty)||0); }, 0);
-        var catSold  = subs.reduce(function(a,s){ return a+(parseInt(s.sold)||0); }, 0);
-        var catTotal = catStock + catSold;
-        var catPct   = catTotal ? Math.round(catSold/catTotal*100) : 0;
+        var subs    = cat.subs || [];
+        var color   = COLS[ci % COLS.length];
+        var catQ    = subs.reduce(function(a,s){ return a+(parseInt(s.qty)||0); },0);
+        var catS    = subs.reduce(function(a,s){ return a+(parseInt(s.sold)||0); },0);
+        var catT    = catQ + catS;
+        var catP    = catT ? Math.round(catS/catT*100) : 0;
 
-        var sec = el('div','rpt-sec');
-
-        /* Section header */
-        var secHdr = el('div','rpt-sec-hdr');
-        var dot    = el('div','rpt-sec-dot');
-        dot.style.background = color;
-        var iconSpan = el('span','', cat.icon||'\uD83D\uDCE6');
-        var nameSpan = el('span','', cat.name);
-        var summSpan = el('span','');
-        summSpan.style.cssText = 'margin-right:auto;font-size:11px;font-weight:400;color:#aaa;';
-        summSpan.textContent   = '\u0645\u062A\u0628\u0642\u064A: ' + catStock + ' | \u0645\u0628\u064A\u0639: ' + catSold + ' | \u0646\u0633\u0628\u0629: ' + catPct + '%';
-        append(secHdr, dot, iconSpan, nameSpan, summSpan);
-        sec.appendChild(secHdr);
+        html += '<div class="sec"><div class="sec-hdr">' +
+          '<div class="sec-dot" style="background:' + color + ';"></div>' +
+          '<span>' + h(cat.icon||'📦') + '</span>' +
+          '<span>' + h(cat.name) + '</span>' +
+          '<span class="sec-sum">\u0645\u062A\u0628\u0642\u064A: ' + catQ + ' | \u0645\u0628\u064A\u0639: ' + catS + ' | \u0646\u0633\u0628\u0629: ' + catP + '%</span>' +
+        '</div>';
 
         if (!subs.length) {
-          var empty = el('div','tbl-wrap');
-          empty.style.cssText = 'padding:14px;text-align:center;color:#aaa;font-size:12px;background:#fff;';
-          empty.textContent = '\u0644\u0627 \u062A\u0648\u062C\u062F \u062A\u0635\u0646\u064A\u0641\u0627\u062A';
-          sec.appendChild(empty);
+          html += '<div class="no-data">\u0644\u0627 \u062A\u0648\u062C\u062F \u062A\u0635\u0646\u064A\u0641\u0627\u062A</div>';
         } else {
-          var wrap  = el('div','tbl-wrap');
-          var table = d.createElement('table');
-          var thead = d.createElement('thead');
-          var hrow  = d.createElement('tr');
-          ['\u0627\u0644\u062A\u0635\u0646\u064A\u0641','\u0627\u0644\u0645\u062A\u0628\u0642\u064A','\u0627\u0644\u0645\u0628\u064A\u0639','\u0627\u0644\u0625\u062C\u0645\u0627\u0644\u064A','\u0646\u0633\u0628\u0629 \u0627\u0644\u0628\u064A\u0639'].forEach(function(h){
-            hrow.appendChild(el('th','',h));
-          });
-          thead.appendChild(hrow);
-          table.appendChild(thead);
+          html += '<div class="tbl-wrap"><table><thead><tr>' +
+            '<th>\u0627\u0644\u062A\u0635\u0646\u064A\u0641</th><th>\u0627\u0644\u0645\u062A\u0628\u0642\u064A</th><th>\u0627\u0644\u0645\u0628\u064A\u0639</th><th>\u0627\u0644\u0625\u062C\u0645\u0627\u0644\u064A</th><th>\u0646\u0633\u0628\u0629 \u0627\u0644\u0628\u064A\u0639</th>' +
+          '</tr></thead><tbody>';
 
-          var tbody = d.createElement('tbody');
           subs.forEach(function(sub) {
-            var s  = parseInt(sub.sold)||0;
             var q  = parseInt(sub.qty)||0;
+            var s  = parseInt(sub.sold)||0;
             var t  = q + s;
             var p  = t ? Math.round(s/t*100) : 0;
-            var cl = p>=70?'h':p>=30?'m':'l';
-
-            var row = d.createElement('tr');
-
-            /* Name */
-            var tdName = d.createElement('td');
-            var strong = el('strong','',sub.name);
-            tdName.appendChild(strong);
-
-            /* Stock */
-            var tdStock = d.createElement('td');
-            tdStock.style.cssText = 'color:#16a085;font-weight:700;';
-            tdStock.textContent = q;
-
-            /* Sold */
-            var tdSold = d.createElement('td');
-            tdSold.style.cssText = 'color:#c0392b;font-weight:700;';
-            tdSold.textContent = s;
-
-            /* Total */
-            var tdTotal = d.createElement('td');
-            tdTotal.textContent = t;
-
-            /* Progress */
-            var tdPct = d.createElement('td');
-            var barWrap = el('div','pbar');
-            var barFill = el('div','pbf '+cl);
-            barFill.style.width = p + '%';
-            barWrap.appendChild(barFill);
-            var pctTxt = el('span','');
-            pctTxt.style.cssText = 'font-size:11px;color:#888;margin-right:6px;';
-            pctTxt.textContent = p + '%';
-            var pctWrap = d.createElement('div');
-            pctWrap.style.cssText = 'display:flex;align-items:center;gap:6px;';
-            pctWrap.appendChild(barWrap);
-            pctWrap.appendChild(pctTxt);
-            tdPct.appendChild(pctWrap);
-
-            append(row, tdName, tdStock, tdSold, tdTotal, tdPct);
-            tbody.appendChild(row);
+            var cl = p>=70?'ph':p>=30?'pm':'pl';
+            html += '<tr>' +
+              '<td><strong>' + h(sub.name) + '</strong></td>' +
+              '<td style="color:#16a085;font-weight:700;">' + q + '</td>' +
+              '<td style="color:#c0392b;font-weight:700;">' + s + '</td>' +
+              '<td>' + t + '</td>' +
+              '<td><div style="display:flex;align-items:center;gap:6px;">' +
+                '<div class="pbar"><div class="pbf ' + cl + '" style="width:' + p + '%;"></div></div>' +
+                '<span style="font-size:11px;color:#888;">' + p + '%</span>' +
+              '</div></td>' +
+            '</tr>';
           });
-          table.appendChild(tbody);
-          wrap.appendChild(table);
-          sec.appendChild(wrap);
+          html += '</tbody></table></div>';
         }
-
-        page.appendChild(sec);
+        html += '</div>';
       });
 
-      /* ── Sales log summary ── */
+      /* Sales log */
       if (S.log.length) {
-        var logSec = el('div','rpt-sec');
-        var logHdr = el('div','rpt-sec-hdr');
-        var logDot = el('div','rpt-sec-dot');
-        logDot.style.background = '#9b59b6';
-        var logTitle = el('span','', '\uD83E\uDDFE \u0633\u062C\u0644 \u0627\u0644\u0645\u0628\u064A\u0639\u0627\u062A \u2014 ' + S.log.length + ' \u0639\u0645\u0644\u064A\u0629');
-        append(logHdr, logDot, logTitle);
-        logSec.appendChild(logHdr);
+        html += '<div class="sec"><div class="sec-hdr">' +
+          '<div class="sec-dot" style="background:#9b59b6;"></div>' +
+          '<span>\uD83E\uDDFE \u0633\u062C\u0644 \u0627\u0644\u0645\u0628\u064A\u0639\u0627\u062A &mdash; ' + S.log.length + ' \u0639\u0645\u0644\u064A\u0629</span>' +
+        '</div><div class="tbl-wrap"><table><thead><tr>' +
+          '<th>\u0631\u0645\u0632 \u0627\u0644\u0645\u0639\u0627\u0645\u0644\u0629</th><th>\u0627\u0644\u062A\u0627\u0631\u064A\u062E</th><th>\u0627\u0644\u0635\u0646\u0641</th><th>\u0627\u0644\u0643\u0645\u064A\u0629</th><th>\u0627\u0644\u0639\u0645\u064A\u0644</th>' +
+        '</tr></thead><tbody>';
 
-        var logWrap  = el('div','tbl-wrap');
-        var logTable = d.createElement('table');
-        var logThead = d.createElement('thead');
-        var logHRow  = d.createElement('tr');
-        ['\u0631\u0645\u0632 \u0627\u0644\u0645\u0639\u0627\u0645\u0644\u0629','\u0627\u0644\u062A\u0627\u0631\u064A\u062E','\u0627\u0644\u0635\u0646\u0641','\u0627\u0644\u0643\u0645\u064A\u0629','\u0627\u0644\u0639\u0645\u064A\u0644'].forEach(function(h){
-          logHRow.appendChild(el('th','',h));
+        S.log.forEach(function(e) {
+          var dt   = new Date(e.time);
+          var day  = dt.toLocaleDateString('ar-SA') + ' ' + pad(dt.getHours()) + ':' + pad(dt.getMinutes());
+          var cn   = (e.client && e.client.name) ? e.client.name : '\u2014';
+          var qty  = e.multi ? e.totalQty : (e.qty||1);
+          var item = e.multi
+            ? ('\uD83D\uDED2 ' + e.items.length + ' \u0623\u0635\u0646\u0627\u0641')
+            : (h(e.catName||'') + ' / ' + h(e.subName||''));
+          html += '<tr>' +
+            '<td style="font-family:monospace;font-size:11px;font-weight:700;color:#b8860b;">' + h(e.txId||'') + '</td>' +
+            '<td style="font-size:11px;color:#888;">' + h(day) + '</td>' +
+            '<td style="font-weight:600;">' + item + '</td>' +
+            '<td style="color:#c0392b;font-weight:800;">' + qty + ' \u0642\u0637\u0639\u0629</td>' +
+            '<td style="font-size:11px;">' + h(cn) + '</td>' +
+          '</tr>';
         });
-        logThead.appendChild(logHRow);
-        logTable.appendChild(logThead);
-
-        var logTbody = d.createElement('tbody');
-        S.log.forEach(function(entry) {
-          var dt  = new Date(entry.time);
-          var day = dt.toLocaleDateString('ar-SA');
-          var tim = pad(dt.getHours()) + ':' + pad(dt.getMinutes());
-          var cn  = (entry.client && entry.client.name)  ? entry.client.name  : '—';
-          var qty = entry.multi ? entry.totalQty : (entry.qty||1);
-          var itemName = entry.multi
-            ? ('\uD83D\uDED2 ' + entry.items.length + ' \u0623\u0635\u0646\u0627\u0641')
-            : ((entry.catName||'') + ' / ' + (entry.subName||''));
-
-          var row = d.createElement('tr');
-          var tdTx = d.createElement('td');
-          tdTx.style.cssText = 'font-family:monospace;font-size:11px;font-weight:700;color:#b8860b;';
-          tdTx.textContent = entry.txId || '—';
-
-          var tdDate = d.createElement('td');
-          tdDate.style.cssText = 'font-size:11px;color:#888;';
-          tdDate.textContent = day + ' ' + tim;
-
-          var tdItem = d.createElement('td');
-          tdItem.style.cssText = 'font-weight:600;';
-          tdItem.textContent = itemName;
-
-          var tdQty = d.createElement('td');
-          tdQty.style.cssText = 'color:#c0392b;font-weight:800;';
-          tdQty.textContent = qty + ' \u0642\u0637\u0639\u0629';
-
-          var tdCl = d.createElement('td');
-          tdCl.style.cssText = 'font-size:11px;';
-          tdCl.textContent = cn;
-
-          append(row, tdTx, tdDate, tdItem, tdQty, tdCl);
-          logTbody.appendChild(row);
-        });
-        logTable.appendChild(logTbody);
-        logWrap.appendChild(logTable);
-        logSec.appendChild(logWrap);
-        page.appendChild(logSec);
+        html += '</tbody></table></div></div>';
       }
 
-      /* ── Footer ── */
-      var foot = el('div','rpt-foot');
-      foot.innerHTML =
-        '\u0645\u062D\u0644 \u0627\u0644\u0631\u064A\u0627\u0646 \u0644\u062A\u062C\u0647\u064A\u0632 \u0627\u0644\u0645\u062D\u0644\u0627\u062A &nbsp;|&nbsp; ' +
-        '\u062A\u0627\u0631\u064A\u062E \u0627\u0644\u062A\u0642\u0631\u064A\u0631: ' + date;
-      page.appendChild(foot);
+      /* Footer */
+      html += '<div class="foot">\u0645\u062D\u0644 \u0627\u0644\u0631\u064A\u0627\u0646 \u0644\u062A\u062C\u0647\u064A\u0632 \u0627\u0644\u0645\u062D\u0644\u0627\u062A &nbsp;|&nbsp; \u062A\u0627\u0631\u064A\u062E \u0627\u0644\u062A\u0642\u0631\u064A\u0631: ' + h(date) + '</div>';
+      html += '</div></body></html>';
 
-      d.body.appendChild(page);
-
-      /* ── Use Blob URL so print dialog shows a real URL, not about:blank ── */
-      var html = '<!DOCTYPE html><html lang="ar" dir="rtl">' + d.head.outerHTML + '<body>' + d.body.innerHTML + '</body></html>';
+      /* Open via Blob URL — avoids about:blank in print dialog */
       var blob = new Blob([html], { type: 'text/html;charset=utf-8' });
       var url  = URL.createObjectURL(blob);
-      w.close();
-      var w2 = window.open(url, '_blank');
-      if (!w2) { toast('السماح بالنوافذ المنبثقة مطلوب', 'w'); return; }
-      /* Revoke the Blob URL after the window has loaded */
-      w2.addEventListener('load', function(){ URL.revokeObjectURL(url); });
-      toast('\uD83D\uDDB8\uFE0F \u062A\u0645 \u0641\u062A\u062D \u0646\u0627\u0641\u0630\u0629 \u0627\u0644\u0637\u0628\u0627\u0639\u0629', 's');
+      var win  = window.open(url, '_blank');
+      if (!win) {
+        /* Fallback: download as HTML file */
+        var a = document.createElement('a');
+        a.href = url; a.download = '\u062A\u0642\u0631\u064A\u0631_\u0633\u0646\u0648\u064A.html';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        toast('\u062A\u0645 \u062A\u062D\u0645\u064A\u0644 \u0627\u0644\u062A\u0642\u0631\u064A\u0631 \u0643\u0645\u0644\u0641 HTML', 'i');
+      } else {
+        win.addEventListener('load', function(){ URL.revokeObjectURL(url); });
+        toast('\uD83D\uDDB8\uFE0F \u062A\u0645 \u0641\u062A\u062D \u0646\u0627\u0641\u0630\u0629 \u0627\u0644\u0637\u0628\u0627\u0639\u0629', 's');
+      }
     }
+
 
 
     /* ═══════════════════════════════════════════════════════════
