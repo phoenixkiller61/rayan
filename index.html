@@ -838,8 +838,8 @@
       <div class="sec">
         <div class="sec-t">📊 محصلة العام <span class="sec-s">تقرير شامل</span></div>
         <div style="display:flex;gap:8px;">
-          <button class="btn btn-blue btn-sm"  onclick="printAnnualReport()">🖨️ طباعة التقرير</button>
-          <button class="btn btn-ghost btn-sm" onclick="exportTxt()">⬇ تصدير</button>
+          <button class="btn btn-blue  btn-sm" onclick="printAnnualReport()">🖨️ طباعة</button>
+          <button class="btn btn-ghost btn-sm" onclick="openM('mExport')">⬇ تصدير</button>
         </div>
       </div>
 
@@ -1108,6 +1108,38 @@
       <button class="btn btn-ghost" onclick="closeM('mReceipt')">إغلاق</button>
       <button class="btn btn-blue"  onclick="printReceipt()">🧾 فتح للطباعة</button>
     </div>
+  </div></div>
+
+  <!-- Export format choice -->
+  <div class="mo" id="mExport"><div class="mdl" style="max-width:360px;">
+    <div class="mhdr"><div class="mt">⬇ تصدير التقرير</div><button class="mx" onclick="closeM('mExport')">✕</button></div>
+    <div class="mbody">
+      <p style="font-size:13px;color:var(--t2);margin-bottom:18px;">اختر صيغة الملف:</p>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+
+        <button onclick="exportTxt();closeM('mExport');"
+          style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--bg3);border:1px solid var(--br2);border-radius:10px;cursor:pointer;width:100%;font-family:'Cairo',sans-serif;transition:border-color .2s;"
+          onmouseover="this.style.borderColor='var(--t2)'" onmouseout="this.style.borderColor='var(--br2)'">
+          <span style="font-size:28px;">📄</span>
+          <div style="text-align:right;">
+            <div style="font-size:14px;font-weight:700;color:var(--t1);">ملف نصي .TXT</div>
+            <div style="font-size:11px;color:var(--t3);margin-top:2px;">تقرير نصي بسيط يمكن فتحه بأي محرر</div>
+          </div>
+        </button>
+
+        <button onclick="exportXlsx();closeM('mExport');"
+          style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--bg3);border:1px solid var(--br2);border-radius:10px;cursor:pointer;width:100%;font-family:'Cairo',sans-serif;transition:border-color .2s;"
+          onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--br2)'">
+          <span style="font-size:28px;">📊</span>
+          <div style="text-align:right;">
+            <div style="font-size:14px;font-weight:700;color:var(--t1);">جدول Excel .CSV</div>
+            <div style="font-size:11px;color:var(--t3);margin-top:2px;">يفتح في Excel و Google Sheets مباشرة</div>
+          </div>
+        </button>
+
+      </div>
+    </div>
+    <div class="mfoot"><button class="btn btn-ghost" onclick="closeM('mExport')">إلغاء</button></div>
   </div></div>
 
   <!-- Delete confirmation -->
@@ -2354,9 +2386,10 @@
 
 
     /* ═══════════════════════════════════════════════════════════
-       16. EXPORT (plain text report)
+       16. EXPORT — TXT and CSV/Excel
     ═══════════════════════════════════════════════════════════ */
 
+    /** Export a plain-text summary report */
     function exportTxt() {
       var lines = [
         'محل الريان لتجهيز المحلات — تقرير المخزون',
@@ -2366,20 +2399,149 @@
         lines.push((cat.icon||'📦') + ' ' + cat.name);
         lines.push('-'.repeat(26));
         (cat.subs||[]).forEach(function(sub) {
-          lines.push('  • ' + sub.name + ': متبقي=' + sub.qty + ' | مباع=' + (sub.sold||0) + ' | إجمالي=' + (sub.qty + (sub.sold||0)));
+          lines.push('  • ' + sub.name + ': متبقي=' + (sub.qty||0) + ' | مباع=' + (sub.sold||0) + ' | إجمالي=' + ((sub.qty||0) + (sub.sold||0)));
         });
         lines.push('');
       });
       lines.push('='.repeat(46));
       lines.push('تاريخ التقرير: ' + new Date().toLocaleDateString('ar-SA'));
 
+      downloadFile(
+        '\uFEFF' + lines.join('\n'),
+        'text/plain;charset=utf-8',
+        'تقرير_مخزون_الريان.txt'
+      );
+      toast('تم تصدير ملف TXT ✅', 's');
+    }
+
+    /**
+     * Export a CSV file that opens directly in Excel / Google Sheets.
+     * Uses UTF-8 BOM so Arabic displays correctly in Excel.
+     */
+    function exportXlsx() {
+      var date = new Date().toLocaleDateString('ar-SA');
+
+      /* ── Sheet 1: Stock summary ── */
+      var rows = [];
+
+      /* Title rows */
+      rows.push(csvRow(['\u0645\u062D\u0644 \u0627\u0644\u0631\u064A\u0627\u0646 \u0644\u062A\u062C\u0647\u064A\u0632 \u0627\u0644\u0645\u062D\u0644\u0627\u062A']));
+      rows.push(csvRow(['\u062A\u0642\u0631\u064A\u0631 \u0627\u0644\u0645\u062E\u0632\u0648\u0646 \u2014 ' + date]));
+      rows.push(csvRow([]));
+
+      /* Header row */
+      rows.push(csvRow([
+        '\u0627\u0644\u0641\u0626\u0629',
+        '\u0627\u0644\u062A\u0635\u0646\u064A\u0641',
+        '\u0627\u0644\u0643\u0645\u064A\u0629 \u0627\u0644\u0645\u062A\u0628\u0642\u064A\u0629',
+        '\u0627\u0644\u0645\u0628\u064A\u0639',
+        '\u0627\u0644\u0625\u062C\u0645\u0627\u0644\u064A',
+        '\u0646\u0633\u0628\u0629 \u0627\u0644\u0628\u064A\u0639 %'
+      ]));
+
+      /* Data rows */
+      S.cats.forEach(function(cat) {
+        (cat.subs||[]).forEach(function(sub) {
+          var q = parseInt(sub.qty)  || 0;
+          var s = parseInt(sub.sold) || 0;
+          var t = q + s;
+          var p = t ? Math.round(s / t * 100) : 0;
+          rows.push(csvRow([cat.name, sub.name, q, s, t, p + '%']));
+        });
+        /* Category subtotal row */
+        var catQ = (cat.subs||[]).reduce(function(a,x){ return a+(parseInt(x.qty)||0); }, 0);
+        var catS = (cat.subs||[]).reduce(function(a,x){ return a+(parseInt(x.sold)||0); }, 0);
+        var catT = catQ + catS;
+        var catP = catT ? Math.round(catS/catT*100) : 0;
+        rows.push(csvRow([
+          '\u0625\u062C\u0645\u0627\u0644\u064A ' + cat.name, '', catQ, catS, catT, catP + '%'
+        ]));
+        rows.push(csvRow([]));
+      });
+
+      /* Grand total */
+      var totQ = S.cats.reduce(function(a,c){ return a+(c.subs||[]).reduce(function(b,s){ return b+(parseInt(s.qty)||0); },0); }, 0);
+      var totS = S.cats.reduce(function(a,c){ return a+(c.subs||[]).reduce(function(b,s){ return b+(parseInt(s.sold)||0); },0); }, 0);
+      var totT = totQ + totS;
+      var totP = totT ? Math.round(totS/totT*100) : 0;
+      rows.push(csvRow(['\u0627\u0644\u0625\u062C\u0645\u0627\u0644\u064A \u0627\u0644\u0643\u0644\u064A', '', totQ, totS, totT, totP + '%']));
+      rows.push(csvRow([]));
+
+      /* ── Sales log section ── */
+      if (S.log.length) {
+        rows.push(csvRow([]));
+        rows.push(csvRow(['\u0633\u062C\u0644 \u0627\u0644\u0645\u0628\u064A\u0639\u0627\u062A']));
+        rows.push(csvRow([
+          '\u0631\u0645\u0632 \u0627\u0644\u0645\u0639\u0627\u0645\u0644\u0629',
+          '\u0627\u0644\u062A\u0627\u0631\u064A\u062E',
+          '\u0627\u0644\u0648\u0642\u062A',
+          '\u0627\u0644\u0641\u0626\u0629',
+          '\u0627\u0644\u0635\u0646\u0641',
+          '\u0627\u0644\u0643\u0645\u064A\u0629',
+          '\u0627\u0644\u0639\u0645\u064A\u0644',
+          '\u0627\u0644\u0647\u0627\u062A\u0641'
+        ]));
+
+        S.log.forEach(function(e) {
+          var dt  = new Date(e.time);
+          var day = dt.toLocaleDateString('ar-SA');
+          var tim = pad(dt.getHours()) + ':' + pad(dt.getMinutes());
+          var cn  = (e.client && e.client.name)  ? e.client.name  : '';
+          var cp  = (e.client && e.client.phone) ? e.client.phone : '';
+
+          if (e.multi && e.items) {
+            /* One row per item in multi-sell */
+            e.items.forEach(function(it, idx) {
+              rows.push(csvRow([
+                idx === 0 ? e.txId : '',
+                idx === 0 ? day   : '',
+                idx === 0 ? tim   : '',
+                it.catName, it.subName, it.qty,
+                idx === 0 ? cn : '',
+                idx === 0 ? cp : ''
+              ]));
+            });
+          } else {
+            rows.push(csvRow([
+              e.txId, day, tim,
+              e.catName||'', e.subName||'', e.qty||1,
+              cn, cp
+            ]));
+          }
+        });
+      }
+
+      downloadFile(
+        '\uFEFF' + rows.join('\n'),
+        'text/csv;charset=utf-8',
+        'تقرير_مخزون_الريان.csv'
+      );
+      toast('تم تصدير ملف Excel ✅', 's');
+    }
+
+    /** Escape a single CSV cell value */
+    function csvCell(v) {
+      var s = String(v === null || v === undefined ? '' : v);
+      /* Wrap in quotes if contains comma, quote, or newline */
+      if (s.indexOf(',') !== -1 || s.indexOf('"') !== -1 || s.indexOf('\n') !== -1) {
+        s = '"' + s.replace(/"/g, '""') + '"';
+      }
+      return s;
+    }
+
+    /** Build a single CSV row from an array of values */
+    function csvRow(cells) {
+      return cells.map(csvCell).join(',');
+    }
+
+    /** Trigger a file download */
+    function downloadFile(content, mimeType, filename) {
       var a = document.createElement('a');
-      a.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent('\uFEFF' + lines.join('\n'));
-      a.download = 'تقرير_مخزون_الريان.txt';
+      a.href = 'data:' + mimeType + ',' + encodeURIComponent(content);
+      a.download = filename;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      toast('تم تصدير التقرير ✅', 's');
     }
 
     /** Open a professional print-ready annual report in a new window */
