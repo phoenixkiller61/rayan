@@ -617,52 +617,31 @@
 
 
     /* ── 21. SEARCH DROPDOWN ITEMS ─────────────────────────────── */
-    .sdrop-hdr   { padding: 8px 14px; font-size: 10px; font-weight: 700; color: var(--t3); letter-spacing: 1px; border-bottom: 1px solid var(--br); background: rgba(0,0,0,.2); border-radius: 12px 12px 0 0; }
+    .sdrop-hdr  { padding: 7px 12px; font-size: 10px; font-weight: 700; color: var(--t3); letter-spacing: 1px; border-bottom: 1px solid var(--br); background: rgba(0,0,0,.25); border-radius: 12px 12px 0 0; }
 
-    .sdrop-item  {
-      display: grid;
-      grid-template-columns: 36px 1fr auto;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 12px;
-      border-bottom: 1px solid var(--br);
-      transition: background .15s;
-    }
+    .sdrop-item { display: flex; flex-direction: row; align-items: center; gap: 8px; padding: 8px 10px; border-bottom: 1px solid var(--br); transition: background .15s; }
     .sdrop-item:last-child { border-bottom: none; }
     .sdrop-item:hover { background: rgba(212,168,67,0.05); }
 
-    .sdrop-img   { width: 36px; height: 36px; border-radius: 7px; background: var(--bg3); border: 1px solid var(--br); display: flex; align-items: center; justify-content: center; font-size: 16px; overflow: hidden; }
+    .sdrop-img { width: 32px; height: 32px; min-width: 32px; flex-shrink: 0; border-radius: 6px; background: var(--bg3); border: 1px solid var(--br); display: flex; align-items: center; justify-content: center; font-size: 14px; overflow: hidden; }
     .sdrop-img img { width: 100%; height: 100%; object-fit: cover; }
 
-    .sdrop-info  { min-width: 0; }
-    .sdrop-cat   { font-size: 10px; color: var(--gold); margin-bottom: 1px; }
-    .sdrop-name  { font-size: 13px; font-weight: 700; color: var(--t1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .sdrop-stock { font-size: 10px; color: var(--t3); margin-top: 2px; }
+    .sdrop-info { flex: 1; min-width: 0; overflow: hidden; }
+    .sdrop-cat  { font-size: 9px; color: var(--gold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sdrop-name { font-size: 12px; font-weight: 700; color: var(--t1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sdrop-stock{ font-size: 9px; color: var(--t3); margin-top: 1px; white-space: nowrap; }
 
-    /* Right column: qty control stacked above add button */
-    .sdrop-ctrl  { display: flex; flex-direction: column; align-items: center; gap: 5px; flex-shrink: 0; }
+    .sdrop-ctrl { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
 
-    .sdrop-qty   { display: flex; align-items: center; background: var(--bg); border: 1px solid var(--br2); border-radius: 7px; height: 30px; direction: ltr; width: 90px; }
-    .sdrop-qty-btn { width: 26px; height: 30px; border: none; cursor: pointer; font-size: 16px; font-weight: 700; display: flex; align-items: center; justify-content: center; transition: background .15s; flex-shrink: 0; }
-    .sdrop-qty-p   { background: rgba(212,168,67,0.08); color: var(--gold); border-right: 1px solid var(--br); border-radius: 7px 0 0 7px; }
-    .sdrop-qty-p:hover { background: rgba(212,168,67,0.22); }
-    .sdrop-qty-m   { background: rgba(224,90,90,0.08); color: var(--red); border-left: 1px solid var(--br); border-radius: 0 7px 7px 0; }
-    .sdrop-qty-m:hover { background: rgba(224,90,90,0.22); }
-    .sdrop-qty-n   { flex: 1; width: 38px; height: 30px; text-align: center; font-size: 13px; font-weight: 800; color: #e05a5a !important; -webkit-text-fill-color: #e05a5a !important; border: none; outline: none; background: transparent; font-family: 'Cairo', sans-serif; opacity: 1; }
+    .sdrop-qty  { display: flex; flex-direction: row; align-items: center; height: 28px; background: var(--bg); border: 1px solid var(--br2); border-radius: 6px; direction: ltr; }
+    .sdrop-qty-btn { width: 24px; min-width: 24px; height: 28px; flex-shrink: 0; border: none; cursor: pointer; font-size: 16px; font-weight: 700; background: transparent; display: flex; align-items: center; justify-content: center; transition: background .15s; }
+    .sdrop-qty-p { color: #d4a843; border-right: 1px solid var(--br); border-radius: 6px 0 0 6px; }
+    .sdrop-qty-m { color: #e05a5a; border-left:  1px solid var(--br); border-radius: 0 6px 6px 0; }
+    .sdrop-qty-p:hover { background: rgba(212,168,67,0.18); }
+    .sdrop-qty-m:hover { background: rgba(224,90,90,0.18); }
+    .sdrop-qty-n { width: 32px; height: 28px; text-align: center; font-size: 13px; font-weight: 900; border: none; outline: none; background: transparent; font-family: 'Cairo', sans-serif; color: #e05a5a; -webkit-text-fill-color: #e05a5a; padding: 0; }
 
-    .sdrop-add {
-      width: 90px;
-      text-align: center;
-      background: rgba(230,126,34,0.15);
-      border: 1px solid rgba(230,126,34,0.3);
-      color: var(--orange);
-      font-size: 11px; font-weight: 700;
-      padding: 4px 0;
-      border-radius: 6px;
-      cursor: pointer;
-      font-family: 'Cairo', sans-serif;
-      transition: background .15s;
-    }
+    .sdrop-add { width: 80px; height: 26px; background: rgba(230,126,34,0.15); border: 1px solid rgba(230,126,34,0.35); color: #e67e22; font-size: 11px; font-weight: 700; border-radius: 6px; cursor: pointer; font-family: 'Cairo', sans-serif; transition: background .15s; display: flex; align-items: center; justify-content: center; gap: 3px; }
     .sdrop-add:hover { background: rgba(230,126,34,0.28); }
 
 
@@ -858,7 +837,10 @@
 
       <div class="sec">
         <div class="sec-t">📊 محصلة العام <span class="sec-s">تقرير شامل</span></div>
-        <button class="btn btn-ghost btn-sm" onclick="exportTxt()">⬇ تصدير</button>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-blue btn-sm"  onclick="printAnnualReport()">🖨️ طباعة التقرير</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportTxt()">⬇ تصدير</button>
+        </div>
       </div>
 
       <!-- Summary stats -->
@@ -2398,6 +2380,297 @@
       a.click();
       document.body.removeChild(a);
       toast('تم تصدير التقرير ✅', 's');
+    }
+
+    /** Open a professional print-ready annual report in a new window */
+    function printAnnualReport() {
+      var cats  = S.cats;
+      var stock = cats.reduce(function(a,c){ return a + (c.subs||[]).reduce(function(b,s){ return b+(parseInt(s.qty)||0); },0); }, 0);
+      var sold  = cats.reduce(function(a,c){ return a + (c.subs||[]).reduce(function(b,s){ return b+(parseInt(s.sold)||0); },0); }, 0);
+      var total = stock + sold;
+      var pct   = total ? Math.round(sold/total*100) : 0;
+      var date  = new Date().toLocaleDateString('ar-SA', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+      var w = window.open('', '_blank');
+      if (!w) { toast('السماح بالنوافذ المنبثقة مطلوب', 'w'); return; }
+
+      var d = w.document;
+      d.open();
+      d.write('<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>تقرير سنوي</title></head><body></body></html>');
+      d.close();
+
+      /* ── Styles ── */
+      var style = d.createElement('style');
+      style.textContent = [
+        '@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap");',
+        '*{margin:0;padding:0;box-sizing:border-box;}',
+        'body{font-family:Cairo,sans-serif;background:#f4f4f4;color:#111;padding:32px 24px;}',
+        '.page{max-width:860px;margin:0 auto;}',
+
+        /* Header */
+        '.rpt-head{display:flex;align-items:center;justify-content:space-between;padding-bottom:16px;border-bottom:3px double #222;margin-bottom:24px;}',
+        '.rpt-logo{width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,#d4a843,#e8b040);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#080810;}',
+        '.rpt-brand{display:flex;align-items:center;gap:14px;}',
+        '.rpt-title{font-size:18px;font-weight:900;color:#111;}',
+        '.rpt-sub{font-size:11px;color:#666;margin-top:2px;}',
+        '.rpt-date{font-size:11px;color:#888;text-align:left;}',
+
+        /* Summary cards */
+        '.rpt-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px;}',
+        '.rpt-sc{background:#fff;border:1px solid #ddd;border-radius:8px;padding:14px 16px;text-align:center;}',
+        '.rpt-sc-lbl{font-size:10px;color:#888;margin-bottom:5px;}',
+        '.rpt-sc-val{font-size:24px;font-weight:900;}',
+        '.rpt-sc-sub{font-size:10px;color:#aaa;margin-top:3px;}',
+        '.rpt-sc.g .rpt-sc-val{color:#b8860b;}',
+        '.rpt-sc.r .rpt-sc-val{color:#c0392b;}',
+        '.rpt-sc.b .rpt-sc-val{color:#2980b9;}',
+        '.rpt-sc.t .rpt-sc-val{color:#16a085;}',
+
+        /* Section */
+        '.rpt-sec{margin-bottom:24px;}',
+        '.rpt-sec-hdr{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#222;color:#fff;border-radius:8px 8px 0 0;font-size:13px;font-weight:700;}',
+        '.rpt-sec-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}',
+
+        /* Table */
+        'table{width:100%;border-collapse:collapse;background:#fff;}',
+        'th{background:#f0f0f0;padding:9px 12px;text-align:right;font-size:11px;font-weight:700;color:#555;border-bottom:2px solid #ddd;}',
+        'td{padding:9px 12px;font-size:12px;border-bottom:1px solid #f0f0f0;vertical-align:middle;}',
+        'tr:last-child td{border-bottom:none;}',
+        'tr:hover td{background:#fafafa;}',
+        '.tbl-wrap{border:1px solid #ddd;border-radius:0 0 8px 8px;overflow:hidden;}',
+
+        /* Progress bar */
+        '.pbar{height:6px;background:#eee;border-radius:3px;overflow:hidden;min-width:80px;}',
+        '.pbf{height:100%;border-radius:3px;}',
+        '.pbf.h{background:#27ae60;} .pbf.m{background:#d4a843;} .pbf.l{background:#e74c3c;}',
+
+        /* Footer */
+        '.rpt-foot{text-align:center;padding-top:20px;border-top:2px double #222;margin-top:28px;font-size:11px;color:#888;}',
+
+        /* Print */
+        '.print-btn{display:block;margin:0 auto 28px;padding:10px 28px;background:#222;color:#fff;border:none;font-family:Cairo,sans-serif;font-size:13px;font-weight:700;border-radius:8px;cursor:pointer;}',
+        '@media print{',
+        '  .print-btn{display:none!important;}',
+        '  body{background:#fff;padding:16px;}',
+        '  .rpt-stats{grid-template-columns:repeat(4,1fr);}',
+        '}'
+      ].join('');
+      d.head.appendChild(style);
+
+      /* ── DOM builder helpers ── */
+      function el(tag, cls, text) {
+        var e = d.createElement(tag);
+        if (cls)  e.className   = cls;
+        if (text !== undefined) e.textContent = text;
+        return e;
+      }
+      function append(parent) {
+        var children = Array.prototype.slice.call(arguments, 1);
+        children.forEach(function(c){ if(c) parent.appendChild(c); });
+        return parent;
+      }
+
+      var page = el('div','page');
+
+      /* ── Print button ── */
+      var printBtn = el('button','print-btn','\uD83D\uDDB8\uFE0F \u0637\u0628\u0627\u0639\u0629 \u0627\u0644\u062A\u0642\u0631\u064A\u0631');
+      printBtn.onclick = function(){ w.print(); };
+      page.appendChild(printBtn);
+
+      /* ── Header ── */
+      var head = el('div','rpt-head');
+      var brand = el('div','rpt-brand');
+      var logo  = el('div','rpt-logo', '\u0631');
+      var info  = el('div','');
+      var title = el('div','rpt-title', '\u0645\u062D\u0644 \u0627\u0644\u0631\u064A\u0627\u0646 \u0644\u062A\u062C\u0647\u064A\u0632 \u0627\u0644\u0645\u062D\u0644\u0627\u062A');
+      var sub   = el('div','rpt-sub',   '\u062A\u0642\u0631\u064A\u0631 \u0633\u0646\u0648\u064A \u0634\u0627\u0645\u0644');
+      append(info, title, sub);
+      append(brand, logo, info);
+      var dateEl = el('div','rpt-date', date);
+      append(head, brand, dateEl);
+      page.appendChild(head);
+
+      /* ── Summary stats ── */
+      var statsGrid = el('div','rpt-stats');
+      var sCols = [
+        {cls:'g', lbl:'\u0627\u0644\u0641\u0626\u0627\u062A',   val: cats.length,  sub:'\u0641\u0626\u0629'},
+        {cls:'b', lbl:'\u0627\u0644\u0645\u062A\u0628\u0642\u064A', val: stock,    sub:'\u0642\u0637\u0639\u0629'},
+        {cls:'r', lbl:'\u0627\u0644\u0645\u0628\u064A\u0639\u0627\u062A', val: sold, sub:'\u0642\u0637\u0639\u0629'},
+        {cls:'t', lbl:'\u0646\u0633\u0628\u0629 \u0627\u0644\u0628\u064A\u0639', val: pct+'%', sub:'\u0645\u0646 \u0627\u0644\u0625\u062C\u0645\u0627\u0644\u064A'}
+      ];
+      sCols.forEach(function(s){
+        var card = el('div','rpt-sc '+s.cls);
+        append(card, el('div','rpt-sc-lbl',s.lbl), el('div','rpt-sc-val',String(s.val)), el('div','rpt-sc-sub',s.sub));
+        statsGrid.appendChild(card);
+      });
+      page.appendChild(statsGrid);
+
+      /* ── Per-category sections ── */
+      var COLS = ['#d4a843','#3a7bd5','#00c9b1','#e05a5a','#9b59b6','#27ae60','#e67e22','#1abc9c','#e91e63','#00bcd4'];
+
+      cats.forEach(function(cat, ci) {
+        var subs  = cat.subs || [];
+        var color = COLS[ci % COLS.length];
+        var catStock = subs.reduce(function(a,s){ return a+(parseInt(s.qty)||0); }, 0);
+        var catSold  = subs.reduce(function(a,s){ return a+(parseInt(s.sold)||0); }, 0);
+        var catTotal = catStock + catSold;
+        var catPct   = catTotal ? Math.round(catSold/catTotal*100) : 0;
+
+        var sec = el('div','rpt-sec');
+
+        /* Section header */
+        var secHdr = el('div','rpt-sec-hdr');
+        var dot    = el('div','rpt-sec-dot');
+        dot.style.background = color;
+        var iconSpan = el('span','', cat.icon||'\uD83D\uDCE6');
+        var nameSpan = el('span','', cat.name);
+        var summSpan = el('span','');
+        summSpan.style.cssText = 'margin-right:auto;font-size:11px;font-weight:400;color:#aaa;';
+        summSpan.textContent   = '\u0645\u062A\u0628\u0642\u064A: ' + catStock + ' | \u0645\u0628\u064A\u0639: ' + catSold + ' | \u0646\u0633\u0628\u0629: ' + catPct + '%';
+        append(secHdr, dot, iconSpan, nameSpan, summSpan);
+        sec.appendChild(secHdr);
+
+        if (!subs.length) {
+          var empty = el('div','tbl-wrap');
+          empty.style.cssText = 'padding:14px;text-align:center;color:#aaa;font-size:12px;background:#fff;';
+          empty.textContent = '\u0644\u0627 \u062A\u0648\u062C\u062F \u062A\u0635\u0646\u064A\u0641\u0627\u062A';
+          sec.appendChild(empty);
+        } else {
+          var wrap  = el('div','tbl-wrap');
+          var table = d.createElement('table');
+          var thead = d.createElement('thead');
+          var hrow  = d.createElement('tr');
+          ['\u0627\u0644\u062A\u0635\u0646\u064A\u0641','\u0627\u0644\u0645\u062A\u0628\u0642\u064A','\u0627\u0644\u0645\u0628\u064A\u0639','\u0627\u0644\u0625\u062C\u0645\u0627\u0644\u064A','\u0646\u0633\u0628\u0629 \u0627\u0644\u0628\u064A\u0639'].forEach(function(h){
+            hrow.appendChild(el('th','',h));
+          });
+          thead.appendChild(hrow);
+          table.appendChild(thead);
+
+          var tbody = d.createElement('tbody');
+          subs.forEach(function(sub) {
+            var s  = parseInt(sub.sold)||0;
+            var q  = parseInt(sub.qty)||0;
+            var t  = q + s;
+            var p  = t ? Math.round(s/t*100) : 0;
+            var cl = p>=70?'h':p>=30?'m':'l';
+
+            var row = d.createElement('tr');
+
+            /* Name */
+            var tdName = d.createElement('td');
+            var strong = el('strong','',sub.name);
+            tdName.appendChild(strong);
+
+            /* Stock */
+            var tdStock = d.createElement('td');
+            tdStock.style.cssText = 'color:#16a085;font-weight:700;';
+            tdStock.textContent = q;
+
+            /* Sold */
+            var tdSold = d.createElement('td');
+            tdSold.style.cssText = 'color:#c0392b;font-weight:700;';
+            tdSold.textContent = s;
+
+            /* Total */
+            var tdTotal = d.createElement('td');
+            tdTotal.textContent = t;
+
+            /* Progress */
+            var tdPct = d.createElement('td');
+            var barWrap = el('div','pbar');
+            var barFill = el('div','pbf '+cl);
+            barFill.style.width = p + '%';
+            barWrap.appendChild(barFill);
+            var pctTxt = el('span','');
+            pctTxt.style.cssText = 'font-size:11px;color:#888;margin-right:6px;';
+            pctTxt.textContent = p + '%';
+            var pctWrap = d.createElement('div');
+            pctWrap.style.cssText = 'display:flex;align-items:center;gap:6px;';
+            pctWrap.appendChild(barWrap);
+            pctWrap.appendChild(pctTxt);
+            tdPct.appendChild(pctWrap);
+
+            append(row, tdName, tdStock, tdSold, tdTotal, tdPct);
+            tbody.appendChild(row);
+          });
+          table.appendChild(tbody);
+          wrap.appendChild(table);
+          sec.appendChild(wrap);
+        }
+
+        page.appendChild(sec);
+      });
+
+      /* ── Sales log summary ── */
+      if (S.log.length) {
+        var logSec = el('div','rpt-sec');
+        var logHdr = el('div','rpt-sec-hdr');
+        var logDot = el('div','rpt-sec-dot');
+        logDot.style.background = '#9b59b6';
+        var logTitle = el('span','', '\uD83E\uDDFE \u0633\u062C\u0644 \u0627\u0644\u0645\u0628\u064A\u0639\u0627\u062A \u2014 ' + S.log.length + ' \u0639\u0645\u0644\u064A\u0629');
+        append(logHdr, logDot, logTitle);
+        logSec.appendChild(logHdr);
+
+        var logWrap  = el('div','tbl-wrap');
+        var logTable = d.createElement('table');
+        var logThead = d.createElement('thead');
+        var logHRow  = d.createElement('tr');
+        ['\u0631\u0645\u0632 \u0627\u0644\u0645\u0639\u0627\u0645\u0644\u0629','\u0627\u0644\u062A\u0627\u0631\u064A\u062E','\u0627\u0644\u0635\u0646\u0641','\u0627\u0644\u0643\u0645\u064A\u0629','\u0627\u0644\u0639\u0645\u064A\u0644'].forEach(function(h){
+          logHRow.appendChild(el('th','',h));
+        });
+        logThead.appendChild(logHRow);
+        logTable.appendChild(logThead);
+
+        var logTbody = d.createElement('tbody');
+        S.log.forEach(function(entry) {
+          var dt  = new Date(entry.time);
+          var day = dt.toLocaleDateString('ar-SA');
+          var tim = pad(dt.getHours()) + ':' + pad(dt.getMinutes());
+          var cn  = (entry.client && entry.client.name)  ? entry.client.name  : '—';
+          var qty = entry.multi ? entry.totalQty : (entry.qty||1);
+          var itemName = entry.multi
+            ? ('\uD83D\uDED2 ' + entry.items.length + ' \u0623\u0635\u0646\u0627\u0641')
+            : ((entry.catName||'') + ' / ' + (entry.subName||''));
+
+          var row = d.createElement('tr');
+          var tdTx = d.createElement('td');
+          tdTx.style.cssText = 'font-family:monospace;font-size:11px;font-weight:700;color:#b8860b;';
+          tdTx.textContent = entry.txId || '—';
+
+          var tdDate = d.createElement('td');
+          tdDate.style.cssText = 'font-size:11px;color:#888;';
+          tdDate.textContent = day + ' ' + tim;
+
+          var tdItem = d.createElement('td');
+          tdItem.style.cssText = 'font-weight:600;';
+          tdItem.textContent = itemName;
+
+          var tdQty = d.createElement('td');
+          tdQty.style.cssText = 'color:#c0392b;font-weight:800;';
+          tdQty.textContent = qty + ' \u0642\u0637\u0639\u0629';
+
+          var tdCl = d.createElement('td');
+          tdCl.style.cssText = 'font-size:11px;';
+          tdCl.textContent = cn;
+
+          append(row, tdTx, tdDate, tdItem, tdQty, tdCl);
+          logTbody.appendChild(row);
+        });
+        logTable.appendChild(logTbody);
+        logWrap.appendChild(logTable);
+        logSec.appendChild(logWrap);
+        page.appendChild(logSec);
+      }
+
+      /* ── Footer ── */
+      var foot = el('div','rpt-foot');
+      foot.innerHTML =
+        '\u0645\u062D\u0644 \u0627\u0644\u0631\u064A\u0627\u0646 \u0644\u062A\u062C\u0647\u064A\u0632 \u0627\u0644\u0645\u062D\u0644\u0627\u062A &nbsp;|&nbsp; ' +
+        '\u062A\u0627\u0631\u064A\u062E \u0627\u0644\u062A\u0642\u0631\u064A\u0631: ' + date;
+      page.appendChild(foot);
+
+      d.body.appendChild(page);
+      toast('\uD83D\uDDB8\uFE0F \u062A\u0645 \u0641\u062A\u062D \u0646\u0627\u0641\u0630\u0629 \u0627\u0644\u0637\u0628\u0627\u0639\u0629', 's');
     }
 
 
